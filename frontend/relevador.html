@@ -88,9 +88,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
       <div class="field"><label>Modelo</label><input id="f-modelo" placeholder="390F"></div>
     </div>
     <div class="row2">
-      <div class="field"><label>Ubicación</label><input id="f-ubicacion" placeholder="Planta Norte"></div>
-      <div class="field"><label>Sector</label><input id="f-sector" placeholder="Minería"></div>
-    </div>
+  <div class="field"><label>Ubicación</label><input id="f-ubicacion" placeholder="Planta Norte"></div>
+  <div class="field"><label>Sector</label><input id="f-sector" placeholder="Minería"></div>
+</div>
+<div class="row2">
+  <div class="field"><label>GPS Latitud</label><input id="f-lat" type="number" step="any" placeholder="-32.123456"></div>
+  <div class="field"><label>GPS Longitud</label><input id="f-lng" type="number" step="any" placeholder="-68.123456"></div>
+</div>
     <div class="field"><label>Horómetro Inicial</label><input id="f-horo" type="number" placeholder="0"></div>
     <div class="field"><label>Foto (PNG/JPG)</label><input type="file" id="f-foto" accept="image/*" onchange="previewFoto(this)"><img id="foto-preview" class="foto-preview"></div>
     <div class="field"><label>Observaciones</label><textarea id="f-obs" rows="2"></textarea></div>
