@@ -2,7 +2,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost/manten_v2")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres.vyyegzbvvcorknqfgywx:26deDiciembre@aws-1-us-west-2.pooler.supabase.com:5432/postgres"
+)
 
 if DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
