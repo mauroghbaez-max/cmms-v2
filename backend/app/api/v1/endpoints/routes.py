@@ -38,11 +38,14 @@ async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = 
     if not user.activo:
         raise HTTPException(status_code=401, detail="Usuario inactivo")
     token = create_access_token({"sub": str(user.id), "rol": user.rol})
-    await db.execute(text("""
-        INSERT INTO log_accesos (id, usuario_id, usuario_nombre, accion, modulo, ip)
-        VALUES (gen_random_uuid(), :uid, :nombre, 'login', 'auth', :ip)
-    """), {"uid": str(user.id), "nombre": user.nombre_completo, "ip": request.client.host if request else "unknown"})
-    await db.commit()
+    try:
+        await db.execute(text("""
+            INSERT INTO log_accesos (id, usuario_id, usuario_nombre, accion, modulo, ip)
+            VALUES (gen_random_uuid(), :uid, :nombre, 'login', 'auth', :ip)
+        """), {"uid": str(user.id), "nombre": user.nombre_completo, "ip": request.client.host if request else "unknown"})
+        await db.commit()
+    except Exception as e:
+        print(f"Log acceso error: {e}", flush=True)
     return {"access_token": token, "token_type": "bearer", "rol": user.rol, "nombre_completo": user.nombre_completo, "id": str(user.id)}
 
 @router.post("/auth/logout")
