@@ -52,6 +52,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
 .empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px;}
 .foto-preview{width:100%;max-height:150px;object-fit:cover;border-radius:var(--r-sm);margin-top:8px;display:none;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <nav>
@@ -136,6 +137,7 @@ function renderizar(lista) {
       <span class="badge ${e.activo ? 'badge-ok' : 'badge-off'}">${e.activo ? 'Activo' : 'Inactivo'}</span>
       <div class="card-actions">
         <button class="btn-sm" onclick="editar('${e.id}')">✏️ Editar</button>
+        <button class="btn-sm" onclick="verQR('${e.id}','${e.codigo_interno}','${e.nombre}')">QR</button>
       </div>
     </div>
   `).join('');
@@ -240,6 +242,44 @@ function salir() {
 }
 
 cargar();
+
+function verQR(id, codigo, nombre) {
+  let overlay = document.getElementById('overlay-qr');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'overlay-qr';
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:#0d2240;border:0.5px solid rgba(55,138,221,0.3);border-radius:14px;padding:28px;text-align:center;min-width:260px;">
+      <div style="font-size:13px;color:#5ba3e8;margin-bottom:4px;font-style:italic;" id="qr-nombre"></div>
+      <div style="font-size:11px;color:#5a7fa8;margin-bottom:16px;font-style:italic;" id="qr-codigo"></div>
+      <div id="qr-canvas" style="display:inline-block;background:white;padding:12px;border-radius:8px;"></div>
+      <div style="margin-top:16px;"><button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
+      <button onclick="imprimirQR()" style="background:#2563a8;border:0.5px solid #378add;color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;margin-left:8px;">Imprimir</button></div>
+    </div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  document.getElementById('qr-nombre').textContent = nombre;
+  document.getElementById('qr-codigo').textContent = codigo;
+  const canvas = document.getElementById('qr-canvas');
+  canvas.innerHTML = '';
+  new QRCode(canvas, { text: codigo, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.H });
+}
+
+function imprimirQR() {
+  const nombre = document.getElementById('qr-nombre').textContent;
+  const codigo = document.getElementById('qr-codigo').textContent;
+  const canvas = document.getElementById('qr-canvas').querySelector('canvas');
+  const img = canvas ? canvas.toDataURL() : '';
+  const w = window.open('', '_blank');
+  w.document.write(`<html><body style="text-align:center;font-family:Arial Narrow,Arial,sans-serif;padding:20px;">
+    <div style="font-size:18px;font-weight:bold;">${nombre}</div>
+    <div style="font-size:13px;color:#666;margin-bottom:12px;">${codigo}</div>
+    <img src="${img}" style="width:200px;height:200px;">
+    <script>window.onload=()=>{window.print();window.close();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
 </script>
 </body>
 </html>
