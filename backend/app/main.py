@@ -47,3 +47,18 @@ async def health():
 
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
+
+@app.get("/setup-admin")
+async def setup_admin():
+    from app.db.session import AsyncSessionLocal
+    from sqlalchemy import text
+    async with AsyncSessionLocal() as db:
+        resultado = await db.execute(text("SELECT id FROM usuarios WHERE username = 'admin'"))
+        if resultado.fetchone():
+            return {"status": "admin ya existe"}
+        await db.execute(text("""
+            INSERT INTO usuarios (id, username, nombre_completo, email, hashed_password, rol, activo, puede_ver_trazabilidad)
+            VALUES (gen_random_uuid(), 'admin', 'Administrador', 'admin@manten.com', :pwd, 'admin', true, true)
+        """), {"pwd": hash_password("admin1234")})
+        await db.commit()
+        return {"status": "admin creado OK"}
