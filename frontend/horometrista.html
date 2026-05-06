@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANTEN. — Horometrista</title>
+<style>
+:root{--az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;--cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;--r:14px;--r-sm:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+nav{background:var(--az2);border-bottom:0.5px solid rgba(55,138,221,0.2);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;}
+.logo{font-size:22px;font-weight:700;color:var(--cel2);letter-spacing:0.15em;margin-right:8px;}
+.rol-badge{background:var(--az3);color:var(--cel3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--cel1);}
+.nav-name{color:var(--txt2);font-size:13px;}
+.spacer{flex:1;}
+.btn-nav{background:transparent;border:0.5px solid rgba(55,138,221,0.3);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
+.btn-nav:hover{background:var(--az3);color:var(--txt1);}
+main{padding:24px;max-width:1000px;margin:0 auto;}
+h2{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
+.toolbar{display:flex;gap:10px;margin-bottom:20px;}
+input,select,textarea{background:var(--az1);border:0.5px solid rgba(55,138,221,0.2);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;font-style:italic;font-family:inherit;outline:none;width:100%;}
+input:focus,select:focus{border-color:var(--cel1);}
+.search{max-width:300px;}
+.btn{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;font-weight:700;}
+.btn:hover{background:var(--cel1);}
+.btn-ok{background:#065f46;border-color:var(--ok);}
+.btn-ok:hover{background:var(--ok);}
+.tabla{width:100%;border-collapse:collapse;}
+.tabla th{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;padding:8px 12px;text-align:left;border-bottom:0.5px solid rgba(55,138,221,0.2);}
+.tabla td{padding:10px 12px;font-size:13px;border-bottom:0.5px solid rgba(55,138,221,0.08);}
+.tabla tr:hover td{background:rgba(55,138,221,0.05);}
+.hs{font-size:18px;font-weight:700;color:var(--cel2);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.3);background:var(--az3);color:var(--txt1);cursor:pointer;font-style:italic;font-family:inherit;}
+.btn-sm:hover{background:var(--az4);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:var(--az2);border:0.5px solid rgba(55,138,221,0.3);border-radius:var(--r);padding:28px;width:100%;max-width:460px;}
+.modal h3{font-size:16px;color:var(--cel2);margin-bottom:6px;}
+.modal-equipo{font-size:12px;color:var(--txt3);margin-bottom:20px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.historial{margin-top:16px;}
+.hist-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(55,138,221,0.08);font-size:12px;}
+.hist-hs{font-weight:700;color:var(--cel2);}
+.hist-meta{color:var(--txt3);}
+.empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px;}
+.panel{display:none;}
+.panel.active{display:block;}
+.tabs{display:flex;gap:8px;margin-bottom:20px;}
+.tab{padding:7px 16px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.2);background:transparent;color:var(--txt2);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
+.tab.active{background:var(--az4);color:var(--txt1);border-color:var(--cel1);}
+</style>
+</head>
+<body>
+<nav>
+  <span class="logo">MANTEN.</span>
+  <span class="rol-badge">Horometrista</span>
+  <span class="nav-name" id="nav-name"></span>
+  <span class="spacer"></span>
+  <button class="btn-nav" onclick="salir()">Salir</button>
+</nav>
+<main>
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('cargar')">Cargar Horómetro</button>
+    <button class="tab" onclick="setTab('historial')">Historial</button>
+  </div>
+
+  <div class="panel active" id="panel-cargar">
+    <h2>Equipos Activos</h2>
+    <div class="toolbar">
+      <input class="search" type="text" placeholder="Buscar equipo..." oninput="filtrar(this.value)">
+    </div>
+    <table class="tabla">
+      <thead><tr><th>Equipo</th><th>Código</th><th>Ubicación</th><th>Horómetro Actual</th><th></th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="panel-historial">
+    <h2>Historial de Lecturas</h2>
+    <div class="toolbar">
+      <select id="sel-equipo" onchange="cargarHistorial()" style="max-width:300px">
+        <option value="">Seleccionar equipo...</option>
+      </select>
+    </div>
+    <div id="historial-contenido"></div>
+  </div>
+</main>
+
+<!-- Modal cargar horómetro -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>Cargar Horómetro</h3>
+    <div class="modal-equipo" id="modal-equipo-nombre"></div>
+    <div class="field"><label>Lectura Actual (hs) *</label><input id="f-lectura" type="number" step="0.1" placeholder="Ej: 1250.5"></div>
+    <div class="field"><label>Observaciones</label><textarea id="f-obs" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-ok" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://cmms-v2-production.up.railway.app/api/v1';
+let token = localStorage.getItem('manten_token');
+let user = JSON.parse(localStorage.getItem('manten_user') || '{}');
+let equipos = [];
+let equipoSelId = null;
+
+if (!token) window.location.href = 'index.html';
+document.getElementById('nav-name').textContent = user.nombre_completo || '';
+
+async function api(method, path, body) {
+  const opts = { method, headers: { Authorization: 'Bearer ' + token } };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const r = await fetch(API + path, opts);
+  if (r.status === 401) { salir(); return; }
+  return r.json();
+}
+
+function setTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='cargar')||(i===1&&tab==='historial')));
+  document.getElementById('panel-cargar').classList.toggle('active', tab==='cargar');
+  document.getElementById('panel-historial').classList.toggle('active', tab==='historial');
+}
+
+async function cargar() {
+  equipos = await api('GET', '/horometrista/equipos') || [];
+  renderTabla(equipos);
+  const sel = document.getElementById('sel-equipo');
+  equipos.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.id;
+    opt.textContent = `${e.nombre} (${e.codigo_interno})`;
+    sel.appendChild(opt);
+  });
+}
+
+function renderTabla(lista) {
+  const tb = document.getElementById('tbody');
+  if (!lista.length) { tb.innerHTML = '<tr><td colspan="5" class="empty">Sin equipos</td></tr>'; return; }
+  tb.innerHTML = lista.map(e => `
+    <tr>
+      <td>${e.nombre}</td>
+      <td>${e.codigo_interno}</td>
+      <td>${e.ubicacion || '-'}</td>
+      <td><span class="hs">${e.horometro_actual?.toLocaleString() || 0} hs</span></td>
+      <td><button class="btn-sm" onclick="abrirModal('${e.id}','${e.nombre}',${e.horometro_actual||0})">+ Lectura</button></td>
+    </tr>
+  `).join('');
+}
+
+function filtrar(q) {
+  renderTabla(equipos.filter(e =>
+    e.nombre.toLowerCase().includes(q.toLowerCase()) ||
+    e.codigo_interno.toLowerCase().includes(q.toLowerCase())
+  ));
+}
+
+function abrirModal(id, nombre, actual) {
+  equipoSelId = id;
+  document.getElementById('modal-equipo-nombre').textContent = `${nombre} — Actual: ${actual.toLocaleString()} hs`;
+  document.getElementById('f-lectura').value = '';
+  document.getElementById('f-obs').value = '';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function cerrarModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+async function guardar() {
+  const lectura = parseFloat(document.getElementById('f-lectura').value);
+  if (!lectura) { alert('Ingresá la lectura'); return; }
+  await api('POST', '/horometrista/horometros', {
+    equipo_id: equipoSelId,
+    lectura,
+    observaciones: document.getElementById('f-obs').value || null
+  });
+  cerrarModal();
+  cargar();
+}
+
+async function cargarHistorial() {
+  const id = document.getElementById('sel-equipo').value;
+  if (!id) return;
+  const data = await api('GET', `/horometrista/horometros/${id}`) || [];
+  const div = document.getElementById('historial-contenido');
+  if (!data.length) { div.innerHTML = '<div class="empty">Sin lecturas registradas</div>'; return; }
+  div.innerHTML = `<div class="historial">${data.map(h => `
+    <div class="hist-row">
+      <span class="hist-hs">${h.lectura?.toLocaleString()} hs</span>
+      <span>${h.anterior ? '↑ ' + (h.lectura - h.anterior).toFixed(1) + ' hs' : ''}</span>
+      <span class="hist-meta">${h.operador || '-'} · ${h.fecha}</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+function salir() {
+  localStorage.clear();
+  window.location.href = 'index.html';
+}
+
+cargar();
+</script>
+</body>
+</html>
