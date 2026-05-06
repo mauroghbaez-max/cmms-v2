@@ -265,3 +265,24 @@ async def historial_horometro(equipo_id: str, db: AsyncSession = Depends(get_db)
     return [{"lectura": r.lectura, "anterior": r.lectura_anterior,
              "fecha": r.fecha.strftime("%d/%m/%Y %H:%M") if r.fecha else "-",
              "operador": r.nombre_completo, "obs": r.observaciones} for r in rows]
+
+@router.put("/horometrista/horometros/{equipo_id}/corregir")
+async def corregir_horometro(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
+    result = await db.execute(text("""
+        SELECT id, lectura FROM horometros WHERE equipo_id = :eid ORDER BY fecha DESC LIMIT 1
+    """), {"eid": equipo_id})
+    ultima = result.fetchone()
+    if not ultima:
+        raise HTTPException(404, "No hay lecturas para corregir")
+    import uuid
+    await db.execute(text("""
+        INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, es_correccion, lectura_original, motivo_correccion, observaciones)
+        VALUES (:id, :eid, :uid, :lec, :ant, true, :orig, :motivo, :obs)
+    """), {"id": str(uuid.uuid4()), "eid": equipo_id, "uid": current_user["id"],
+           "lec": payload["lectura"], "ant": ultima.lectura,
+           "orig": ultima.lectura, "motivo": payload.get("motivo", "Correccion manual"),
+           "obs": payload.get("observaciones")})
+    await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
+                     {"lec": payload["lectura"], "id": equipo_id})
+    await db.commit()
+    return {"ok": True}
