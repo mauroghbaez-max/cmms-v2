@@ -167,3 +167,101 @@ async def trazabilidad(equipo_id: str = None, fecha_desde: str = None, fecha_has
     result = await db.execute(text(sql), params)
     rows = result.fetchall()
     return [{"numero": r.numero, "estado": r.estado, "descripcion": r.descripcion, "vehiculo": r.vehiculo_traslado, "equipo_nombre": r.equipo_nombre, "equipo_codigo": r.equipo_codigo, "ubicacion": r.ubicacion, "plan_nombre": r.plan_nombre, "horas_hito": r.horas_hito, "horometro_apertura": r.horometro_apertura, "horometro_cierre": r.horometro_cierre, "fecha_apertura": r.fecha_apertura.strftime("%d/%m/%Y %H:%M") if r.fecha_apertura else "-", "fecha_liberacion": r.fecha_liberacion.strftime("%d/%m/%Y %H:%M") if r.fecha_liberacion else "-", "fecha_rrhh": r.fecha_aprobacion_rrhh.strftime("%d/%m/%Y %H:%M") if r.fecha_aprobacion_rrhh else "-", "fecha_cierre": r.fecha_cierre.strftime("%d/%m/%Y %H:%M") if r.fecha_cierre else "-", "planificador": r.planificador_nombre, "mecanico": r.mecanico_nombre, "auxiliar": r.auxiliar_nombre, "rrhh_aprobado": r.rrhh_aprobado, "panol_aprobado": r.panol_aprobado, "observaciones": r.observaciones} for r in rows]
+
+# ─── RELEVADOR ────────────────────────────────────────────────────────────────
+
+@router.get("/relevador/equipos")
+async def relevador_equipos(db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
+    result = await db.execute(text("""
+        SELECT id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
+               marca, modelo, anio, horometro_actual, activo, observaciones,
+               foto1_base64, qr_code
+        FROM equipos ORDER BY nombre
+    """))
+    rows = result.fetchall()
+    return [{"id": str(r.id), "nombre": r.nombre, "codigo_interno": r.codigo_interno,
+             "codigo_sap": r.codigo_sap, "ubicacion": r.ubicacion, "sector": r.sector,
+             "marca": r.marca, "modelo": r.modelo, "anio": r.anio,
+             "horometro_actual": r.horometro_actual, "activo": r.activo,
+             "observaciones": r.observaciones, "foto1_base64": r.foto1_base64,
+             "qr_code": r.qr_code} for r in rows]
+
+@router.post("/relevador/equipos")
+async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
+    existe = await db.execute(text("SELECT id FROM equipos WHERE codigo_interno = :c"), {"c": payload["codigo_interno"]})
+    if existe.fetchone():
+        raise HTTPException(400, "Código interno ya existe")
+    import uuid
+    eid = str(uuid.uuid4())
+    await db.execute(text("""
+        INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
+                             marca, modelo, anio, horometro_inicial, horometro_actual,
+                             foto1_base64, activo, observaciones, relevador_id)
+        VALUES (:id, :nombre, :ci, :cs, :ubi, :sector, :marca, :modelo, :anio,
+                :h0, :h0, :foto, :activo, :obs, :rid)
+    """), {"id": eid, "nombre": payload["nombre"], "ci": payload["codigo_interno"],
+           "cs": payload.get("codigo_sap"), "ubi": payload.get("ubicacion"),
+           "sector": payload.get("sector"), "marca": payload.get("marca"),
+           "modelo": payload.get("modelo"), "anio": payload.get("anio"),
+           "h0": payload.get("horometro_inicial", 0), "foto": payload.get("foto1_base64"),
+           "activo": payload.get("activo", True), "obs": payload.get("observaciones"),
+           "rid": current_user["id"]})
+    await db.commit()
+    return {"ok": True, "id": eid}
+
+@router.put("/relevador/equipos/{equipo_id}")
+async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
+    sets, params = [], {"id": equipo_id}
+    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio", "activo", "observaciones", "foto1_base64"]:
+        if campo in payload:
+            sets.append(f"{campo} = :{campo}")
+            params[campo] = payload[campo]
+    if sets:
+        await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
+        await db.commit()
+    return {"ok": True}
+
+# ─── HOROMETRISTA ─────────────────────────────────────────────────────────────
+
+@router.get("/horometrista/equipos")
+async def horometrista_equipos(db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
+    result = await db.execute(text("""
+        SELECT id, nombre, codigo_interno, ubicacion, sector, horometro_actual, activo
+        FROM equipos WHERE activo = true ORDER BY nombre
+    """))
+    rows = result.fetchall()
+    return [{"id": str(r.id), "nombre": r.nombre, "codigo_interno": r.codigo_interno,
+             "ubicacion": r.ubicacion, "sector": r.sector,
+             "horometro_actual": r.horometro_actual} for r in rows]
+
+@router.post("/horometrista/horometros")
+async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
+    result = await db.execute(text("SELECT horometro_actual FROM equipos WHERE id = :id"), {"id": payload["equipo_id"]})
+    equipo = result.fetchone()
+    if not equipo:
+        raise HTTPException(404, "Equipo no encontrado")
+    import uuid
+    await db.execute(text("""
+        INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, observaciones)
+        VALUES (:id, :eid, :uid, :lec, :ant, :obs)
+    """), {"id": str(uuid.uuid4()), "eid": payload["equipo_id"], "uid": current_user["id"],
+           "lec": payload["lectura"], "ant": equipo.horometro_actual,
+           "obs": payload.get("observaciones")})
+    await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
+                     {"lec": payload["lectura"], "id": payload["equipo_id"]})
+    await db.commit()
+    return {"ok": True}
+
+@router.get("/horometrista/horometros/{equipo_id}")
+async def historial_horometro(equipo_id: str, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
+    result = await db.execute(text("""
+        SELECT h.lectura, h.lectura_anterior, h.fecha, h.observaciones, u.nombre_completo
+        FROM horometros h
+        LEFT JOIN usuarios u ON u.id = h.usuario_id
+        WHERE h.equipo_id = :eid
+        ORDER BY h.fecha DESC LIMIT 50
+    """), {"eid": equipo_id})
+    rows = result.fetchall()
+    return [{"lectura": r.lectura, "anterior": r.lectura_anterior,
+             "fecha": r.fecha.strftime("%d/%m/%Y %H:%M") if r.fecha else "-",
+             "operador": r.nombre_completo, "obs": r.observaciones} for r in rows]
