@@ -51,6 +51,8 @@ input:focus,select:focus{border-color:var(--cel1);}
 .tab{padding:7px 16px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.2);background:transparent;color:var(--txt2);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
 .tab.active{background:var(--az4);color:var(--txt1);border-color:var(--cel1);}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 <nav>
@@ -70,6 +72,7 @@ input:focus,select:focus{border-color:var(--cel1);}
     <h2>Equipos Activos</h2>
     <div class="toolbar">
       <input class="search" type="text" placeholder="Buscar equipo..." oninput="filtrar(this.value)">
+      <button class="btn" onclick="abrirScanner()">📷 Escanear QR</button>
     </div>
     <table class="tabla">
       <thead><tr><th>Equipo</th><th>Código</th><th>Ubicación</th><th>Horómetro Actual</th><th></th></tr></thead>
@@ -204,6 +207,49 @@ function salir() {
 }
 
 cargar();
+
+function abrirScanner() {
+  let overlay = document.getElementById('overlay-scanner');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'overlay-scanner';
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:#0d2240;border:0.5px solid rgba(55,138,221,0.3);border-radius:14px;padding:24px;text-align:center;width:320px;">
+      <div style="font-size:14px;color:#5ba3e8;margin-bottom:12px;font-style:italic;">Escaneá el código QR del equipo</div>
+      <div id="qr-reader" style="width:280px;margin:0 auto;border-radius:8px;overflow:hidden;"></div>
+      <div style="margin-top:16px;">
+        <button onclick="cerrarScanner()" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cancelar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  const scanner = new Html5Qrcode("qr-reader");
+  window._scanner = scanner;
+  scanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 220 },
+    (decoded) => {
+      cerrarScanner();
+      const equipo = equipos.find(e => e.codigo_interno === decoded);
+      if (equipo) {
+        abrirModal(equipo.id, equipo.nombre, equipo.horometro_actual || 0);
+      } else {
+        alert("Equipo no encontrado: " + decoded);
+      }
+    },
+    () => {}
+  ).catch(err => alert("No se pudo acceder a la cámara: " + err));
+}
+
+function cerrarScanner() {
+  if (window._scanner) {
+    window._scanner.stop().catch(()=>{});
+    window._scanner = null;
+  }
+  const overlay = document.getElementById('overlay-scanner');
+  if (overlay) overlay.style.display = 'none';
+}
 </script>
 </body>
 </html>
