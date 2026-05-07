@@ -52,4 +52,4 @@ app.include_router(panol_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import operador_routes
 app.include_router(operador_routes.router, prefix="/api/v1")
 
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+app.mount("/app", StaticFiles(directory="frontend", html=True), name="frontend")
