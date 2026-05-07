@@ -3,11 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from app.db.session import get_db
 from app.api.v1.endpoints.routes import get_current_user, require_rol
-import uuid, base64
+import uuid, json
 
 router = APIRouter()
-
-# ─── LISTAR OTs ASIGNADAS A RRHH ─────────────────────────────────────────────
 
 @router.get("/rrhh/ots")
 async def rrhh_listar_ots(
@@ -77,6 +75,14 @@ async def rrhh_detalle_ot(
         FROM ot_materiales WHERE ot_id = :oid ORDER BY descripcion
     """), {"oid": ot_id})
 
+    epp_items = ot.epp_items or []
+    if isinstance(epp_items, str):
+        epp_items = json.loads(epp_items)
+
+    docs = ot.documentos_rrhh or []
+    if isinstance(docs, str):
+        docs = json.loads(docs)
+
     return {
         "id": str(ot.id), "numero": ot.numero, "tipo": ot.tipo,
         "urgente": ot.urgente, "estado": ot.estado,
@@ -94,16 +100,14 @@ async def rrhh_detalle_ot(
         "mecanico_nombre": ot.mecanico_nombre,
         "auxiliar_nombre": ot.auxiliar_nombre,
         "cantidad_personal": ot.cantidad_personal,
-        "epp_items": ot.epp_items or [],
-        "documentos_rrhh": ot.documentos_rrhh or [],
+        "epp_items": epp_items,
+        "documentos_rrhh": docs,
         "observaciones": ot.observaciones,
         "fecha_apertura": ot.fecha_apertura.strftime("%d/%m/%Y %H:%M") if ot.fecha_apertura else "—",
         "materiales": [{"descripcion": m.descripcion, "cantidad": m.cantidad,
                         "unidad": m.unidad, "tipo": m.tipo} for m in mats.fetchall()],
     }
 
-
-# ─── CARGAR DATOS RRHH ────────────────────────────────────────────────────────
 
 @router.put("/rrhh/ots/{ot_id}/cargar")
 async def rrhh_cargar_datos(
@@ -112,33 +116,32 @@ async def rrhh_cargar_datos(
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_rol("rrhh"))
 ):
-    """
-    RRHH carga personal, EPP y documentación.
-    No da el visto bueno todavía — solo guarda los datos.
-    """
+    epp_items = payload.get("epp_items", [])
+    documentos_rrhh = payload.get("documentos_rrhh", [])
+    epp_json = json.dumps(epp_items)
+    docs_json = json.dumps(documentos_rrhh)
+
     await db.execute(text("""
         UPDATE ordenes_trabajo SET
             mecanico_nombre    = :mecanico,
             auxiliar_nombre    = :auxiliar,
             cantidad_personal  = :cp,
-            epp_items          = :epp,
-            documentos_rrhh    = :docs,
+            epp_items          = :epp::jsonb,
+            documentos_rrhh    = :docs::jsonb,
             observaciones      = :obs
         WHERE id = :id
     """), {
         "mecanico":  payload.get("mecanico_nombre"),
         "auxiliar":  payload.get("auxiliar_nombre"),
-        "cp":        payload.get("cantidad_personal"),
-        "epp":       payload.get("epp_items", []),
-        "docs":      payload.get("documentos_rrhh", []),
+        "cp":        payload.get("cantidad_personal", 1),
+        "epp":       epp_json,
+        "docs":      docs_json,
         "obs":       payload.get("observaciones"),
         "id":        ot_id,
     })
     await db.commit()
     return {"ok": True}
 
-
-# ─── VISTO BUENO RRHH ─────────────────────────────────────────────────────────
 
 @router.post("/rrhh/ots/{ot_id}/aprobar")
 async def rrhh_aprobar(
@@ -147,12 +150,6 @@ async def rrhh_aprobar(
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_rol("rrhh"))
 ):
-    """
-    Visto bueno de RRHH. Dispara 2 acciones:
-    1) Marca rrhh_aprobado = true → habilita al planificador a imprimir
-    2) Crea entradas en panol_entregas para los EPP → Pañol recibe la orden
-    """
-    # Validar que tenga personal cargado
     ot_r = await db.execute(text("""
         SELECT id, mecanico_nombre, epp_items, rrhh_aprobado, numero, equipo_id
         FROM ordenes_trabajo WHERE id = :id
@@ -165,7 +162,6 @@ async def rrhh_aprobar(
     if not ot.mecanico_nombre:
         raise HTTPException(400, "Debe cargar al menos el mecánico antes de aprobar")
 
-    # 1) Marcar aprobado
     await db.execute(text("""
         UPDATE ordenes_trabajo SET
             rrhh_aprobado = true,
@@ -174,10 +170,8 @@ async def rrhh_aprobar(
         WHERE id = :id
     """), {"id": ot_id})
 
-    # 2) Crear orden de entrega de EPP al Pañol
     epp_items = ot.epp_items or []
     if isinstance(epp_items, str):
-        import json
         epp_items = json.loads(epp_items)
 
     for epp in epp_items:
@@ -197,7 +191,6 @@ async def rrhh_aprobar(
             "unombre": current_user["nombre_completo"],
         })
 
-    # Registrar en auditoría
     await db.execute(text("""
         INSERT INTO ot_auditoria
             (id, ot_id, usuario_id, usuario_nombre, accion, detalle)
