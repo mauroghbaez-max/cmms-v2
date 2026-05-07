@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — MANTEN.</title>
+<style>
+:root{
+  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
+  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--cel4:#e6f1fb;
+  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+.topbar{background:var(--az2);border-bottom:0.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:20px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;cursor:pointer;}
+.role-pill{background:rgba(37,99,168,0.25);color:var(--cel2);font-size:11px;padding:3px 12px;border-radius:20px;border:0.5px solid rgba(91,163,232,0.3);}
+.user-name{color:var(--txt2);font-size:13px;}
+.nav{display:flex;gap:4px;}
+.nav-btn{background:none;border:none;color:#d8e8f5;font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
+.nav-btn.act{background:rgba(37,99,168,0.25);color:#f0f6ff;border:0.5px solid rgba(91,163,232,0.35);font-weight:700;}
+.btn-salir{background:none;border:0.5px solid var(--border);color:#d8e8f5;font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
+.main{padding:20px 24px;max-width:1400px;margin:0 auto;}
+.panel{display:none;}.panel.act{display:block;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin:18px 0 10px;}
+.card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;}
+.fg input,.fg select,.fg textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cel1);}
+.fg select option{background:var(--az2);}
+.btn{font-size:12px;padding:8px 16px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(37,99,168,0.15);color:var(--cel3);cursor:pointer;font-style:italic;font-family:inherit;}
+.btn:hover{border-color:var(--cel1);color:var(--cel2);}
+.btn-primary{background:var(--az4);border-color:var(--cel1);color:var(--txt1);}
+.btn-primary:hover{background:var(--cel1);}
+.btn-danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--danger);}
+.btn-sm{font-size:11px;padding:4px 10px;}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--txt3);padding:8px 12px;border-bottom:0.5px solid var(--border);}
+.tbl td{padding:9px 12px;border-bottom:0.5px solid var(--border);color:var(--txt1);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(37,99,168,0.08);}
+.badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
+.badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
+.badge-off{background:rgba(239,68,68,0.1);color:var(--danger);border:0.5px solid rgba(239,68,68,0.3);}
+.badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--cel2);}
+.divider{border:none;border-top:0.5px solid var(--border);margin:14px 0;}
+.switch{position:relative;display:inline-block;width:38px;height:22px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,0.1);border-radius:22px;transition:.3s;}
+.slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:var(--txt3);border-radius:50%;transition:.3s;}
+input:checked+.slider{background:var(--az4);}
+input:checked+.slider:before{transform:translateX(16px);background:#fff;}
+.upload-zone{border:0.5px dashed rgba(91,163,232,0.3);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px;}
+.upload-zone:hover{border-color:var(--cel1);background:rgba(37,99,168,0.08);}
+.logo-preview{max-height:60px;max-width:200px;object-fit:contain;display:block;margin-bottom:10px;}
+.empty{color:var(--txt3);font-size:13px;padding:24px;text-align:center;}
+.loading{color:var(--txt3);font-size:13px;padding:16px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="row" style="gap:14px;">
+    <span class="logo" id="logo-empresa">MANTEN.</span>
+    <span class="role-pill">Admin</span>
+    <span class="user-name" id="user-name"></span>
+  </div>
+  <div class="nav">
+    <button class="nav-btn act" onclick="setPanel('empresa',this)">Empresa</button>
+    <button class="nav-btn" onclick="setPanel('usuarios',this)">Usuarios</button>
+    <button class="nav-btn" onclick="setPanel('trazabilidad',this)">Trazabilidad</button>
+    <button class="nav-btn" onclick="setPanel('accesos',this)">Accesos</button>
+  </div>
+  <button class="btn-salir" onclick="logout()">Salir</button>
+</div>
+
+<div class="main">
+
+<!-- EMPRESA -->
+<div class="panel act" id="panel-empresa">
+  <div class="section-title">Configuración de la empresa</div>
+  <div class="card" style="max-width:700px;">
+    <div class="section-title" style="margin-top:0;">Logo</div>
+    <img id="logo-preview" class="logo-preview" src="" style="display:none;">
+    <div class="upload-zone" onclick="document.getElementById('logo-input').click()">
+      <div style="font-size:13px;color:var(--txt2);">Subir logo — PNG o JPG</div>
+      <div style="font-size:11px;color:var(--txt3);margin-top:4px;">Aparece en todos los documentos PDF</div>
+    </div>
+    <input type="file" id="logo-input" accept="image/*" style="display:none;" onchange="cargarLogo(this)">
+    <hr class="divider">
+    <div class="form-grid">
+      <div class="fg"><label>Nombre de la empresa</label><input type="text" id="emp-nombre" placeholder="Ej: Minera San Juan S.A."></div>
+      <div class="fg"><label>CUIT</label><input type="text" id="emp-cuit" placeholder="30-12345678-9"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Dirección</label><input type="text" id="emp-dir" placeholder="Calle 123, Ciudad"></div>
+      <div class="fg"><label>Teléfono</label><input type="text" id="emp-tel" placeholder="+54 261 123-4567"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Email</label><input type="text" id="emp-email" placeholder="contacto@empresa.com"></div>
+      <div class="fg"><label>Sitio web</label><input type="text" id="emp-web" placeholder="www.empresa.com"></div>
+    </div>
+    <div class="fg" style="margin-bottom:14px;"><label>Observaciones</label><textarea id="emp-obs" rows="2" placeholder="Notas adicionales..."></textarea></div>
+    <button class="btn btn-primary" onclick="guardarEmpresa()">Guardar configuración</button>
+  </div>
+</div>
+
+<!-- USUARIOS -->
+<div class="panel" id="panel-usuarios">
+  <div class="row" style="justify-content:space-between;margin-bottom:14px;">
+    <div class="section-title" style="margin:0;">Gestión de usuarios</div>
+    <button class="btn btn-primary" onclick="abrirNuevoUsuario()">+ Nuevo usuario</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr>
+        <th>Nombre completo</th><th>Usuario</th><th>Rol</th><th>Área</th>
+        <th>Estado</th><th>Trazabilidad</th><th>Email notif.</th><th></th>
+      </tr></thead>
+      <tbody id="tbody-usuarios"><tr><td colspan="8" class="loading">Cargando...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TRAZABILIDAD -->
+<div class="panel" id="panel-trazabilidad">
+  <div class="row" style="justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+    <div class="row" style="gap:10px;flex-wrap:wrap;">
+      <div class="fg" style="flex-direction:row;align-items:center;gap:8px;">
+        <label style="white-space:nowrap;font-size:12px;color:var(--txt3);">Desde</label>
+        <input type="date" id="traz-desde" style="width:160px;">
+      </div>
+      <div class="fg" style="flex-direction:row;align-items:center;gap:8px;">
+        <label style="white-space:nowrap;font-size:12px;color:var(--txt3);">Hasta</label>
+        <input type="date" id="traz-hasta" style="width:160px;">
+      </div>
+      <select id="traz-equipo" style="background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 12px;font-style:italic;font-family:inherit;">
+        <option value="">Todos los equipos</option>
+      </select>
+      <button class="btn btn-primary" onclick="cargarTrazabilidad()">Filtrar</button>
+    </div>
+    <button class="btn" style="color:var(--ok);border-color:rgba(16,185,129,0.3);" onclick="exportarTrazabilidad()">Exportar Excel</button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="tbl" style="min-width:1400px;">
+      <thead><tr>
+        <th>OT</th><th>Estado</th><th>Equipo</th><th>Código</th><th>Ubicación</th>
+        <th>Plan</th><th>Hs apertura</th><th>Hs cierre</th>
+        <th>Fecha apertura</th><th>Fecha liberación</th><th>Fecha RRHH</th><th>Fecha cierre</th>
+        <th>Planificador</th><th>Mecánico</th><th>Auxiliar</th><th>Vehículo</th>
+        <th>RRHH</th><th>Pañol</th><th>Observaciones</th>
+      </tr></thead>
+      <tbody id="tbody-trazabilidad"><tr><td colspan="19" class="empty">Aplicá filtros y hacé clic en Filtrar</td></tr></tbody>
+    </table>
+  </div>
+  <div id="resumen-traz" style="font-size:12px;color:var(--txt3);margin-top:10px;"></div>
+</div>
+
+<!-- ACCESOS -->
+<div class="panel" id="panel-accesos">
+  <div class="section-title">Log de accesos al sistema</div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>Usuario</th><th>Acción</th><th>Módulo</th><th>IP</th><th>Fecha</th></tr></thead>
+      <tbody id="tbody-accesos"><tr><td colspan="5" class="loading">Cargando...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL USUARIO -->
+<div class="modal-bg" id="modal-usuario">
+  <div class="modal">
+    <div class="modal-title" id="modal-user-titulo">Nuevo usuario</div>
+    <input type="hidden" id="edit-user-id">
+    <div class="form-grid">
+      <div class="fg"><label>Nombre completo</label><input type="text" id="u-nombre" placeholder="Juan Pérez"></div>
+      <div class="fg"><label>Usuario (login)</label><input type="text" id="u-username" placeholder="jperez"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Contraseña</label><input type="password" id="u-password" placeholder="Dejar vacío para no cambiar"></div>
+      <div class="fg"><label>Área</label><input type="text" id="u-area" placeholder="Mantenimiento"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Rol</label>
+        <select id="u-rol">
+          <option value="admin">Admin</option>
+          <option value="planificador">Planificador</option>
+          <option value="rrhh">RRHH</option>
+          <option value="panol">Pañol</option>
+          <option value="horometrista">Horometrista</option>
+          <option value="relevador">Relevador</option>
+          <option value="operario">Operario</option>
+        </select>
+      </div>
+      <div class="fg"><label>Email notificaciones</label><input type="text" id="u-email-noti" placeholder="juan@empresa.com"></div>
+    </div>
+    <div class="fg" style="margin-bottom:14px;"><label>Observaciones</label><textarea id="u-obs" rows="2"></textarea></div>
+    <div class="row" style="justify-content:space-between;margin-bottom:16px;">
+      <div class="row" style="gap:10px;">
+        <label class="switch"><input type="checkbox" id="u-activo" checked><span class="slider"></span></label>
+        <span style="font-size:13px;">Activo</span>
+      </div>
+      <div class="row" style="gap:10px;">
+        <label class="switch"><input type="checkbox" id="u-trazabilidad"><span class="slider"></span></label>
+        <span style="font-size:13px;">Puede ver trazabilidad</span>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+      <button class="btn" onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://cmms-v2-production.up.railway.app/api/v1';
+const TOKEN = localStorage.getItem('manten_token');
+const USER = JSON.parse(localStorage.getItem('manten_user') || '{}');
+let trazData = [];
+let logoB64 = null, logoMime = null;
+let editUserId = null;
+
+if (!TOKEN) window.location.href = 'index.html';
+if (USER.nombre_completo) document.getElementById('user-name').textContent = USER.nombre_completo;
+
+async function api(path, opts={}) {
+  const r = await fetch(API + path, {
+    headers: {'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json', ...opts.headers},
+    ...opts
+  });
+  if (r.status === 401) { logout(); return null; }
+  return r.json();
+}
+
+function logout() {
+  localStorage.removeItem('manten_token');
+  localStorage.removeItem('manten_user');
+  window.location.href = 'index.html';
+}
+
+function setPanel(nombre, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('act'));
+  document.getElementById('panel-' + nombre).classList.add('act');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('act'));
+  el.classList.add('act');
+  if (nombre === 'usuarios') cargarUsuarios();
+  if (nombre === 'trazabilidad') cargarEquiposSelect();
+  if (nombre === 'accesos') cargarAccesos();
+}
+
+async function cargarEmpresa() {
+  const d = await api('/admin/empresa');
+  if (!d) return;
+  document.getElementById('emp-nombre').value = d.nombre || '';
+  document.getElementById('emp-cuit').value = d.cuit || '';
+  document.getElementById('emp-dir').value = d.direccion || '';
+  document.getElementById('emp-tel').value = d.telefono || '';
+  document.getElementById('emp-email').value = d.email || '';
+  document.getElementById('emp-web').value = d.web || '';
+  if (d.logo_base64) {
+    logoB64 = d.logo_base64; logoMime = d.logo_mime;
+    var img = document.getElementById('logo-preview');
+    img.src = 'data:' + d.logo_mime + ';base64,' + d.logo_base64;
+    img.style.display = 'block';
+    document.getElementById('logo-empresa').textContent = d.nombre || 'MANTEN.';
+  }
+}
+
+function cargarLogo(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var parts = e.target.result.split(',');
+    logoB64 = parts[1]; logoMime = file.type;
+    var img = document.getElementById('logo-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function guardarEmpresa() {
+  var r = await api('/admin/empresa', { method: 'PUT', body: JSON.stringify({
+    nombre: document.getElementById('emp-nombre').value,
+    cuit: document.getElementById('emp-cuit').value,
+    direccion: document.getElementById('emp-dir').value,
+    telefono: document.getElementById('emp-tel').value,
+    email: document.getElementById('emp-email').value,
+    web: document.getElementById('emp-web').value,
+    logo_base64: logoB64, logo_mime: logoMime,
+  })});
+  if (r && r.ok) {
+    alert('Configuración guardada.');
+    var nombre = document.getElementById('emp-nombre').value;
+    if (nombre) document.getElementById('logo-empresa').textContent = nombre;
+  }
+}
+
+async function cargarUsuarios() {
+  var data = await api('/admin/usuarios') || [];
+  var roles = {admin:'Admin',planificador:'Planificador',rrhh:'RRHH',panol:'Pañol',horometrista:'Horometrista',relevador:'Relevador',operario:'Operario'};
+  var tbody = document.getElementById('tbody-usuarios');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Sin usuarios</td></tr>'; return; }
+  tbody.innerHTML = data.map(function(u) {
+    return '<tr><td style="font-weight:700;">' + u.nombre_completo + '</td>' +
+      '<td style="color:var(--txt3);">' + u.username + '</td>' +
+      '<td><span class="badge badge-rol">' + (roles[u.rol]||u.rol) + '</span></td>' +
+      '<td>' + (u.area||'—') + '</td>' +
+      '<td><span class="badge ' + (u.activo?'badge-ok':'badge-off') + '">' + (u.activo?'Activo':'Inactivo') + '</span></td>' +
+      '<td style="text-align:center;">' + (u.puede_ver_trazabilidad?'Sí':'—') + '</td>' +
+      '<td style="color:var(--txt3);font-size:11px;">' + (u.email_notificaciones||'—') + '</td>' +
+      '<td><button class="btn btn-sm" onclick=\'editarUsuario(' + JSON.stringify(u) + ')\'>Editar</button></td></tr>';
+  }).join('');
+}
+
+function abrirNuevoUsuario() {
+  editUserId = null;
+  document.getElementById('modal-user-titulo').textContent = 'Nuevo usuario';
+  document.getElementById('edit-user-id').value = '';
+  document.getElementById('u-nombre').value = '';
+  document.getElementById('u-username').value = '';
+  document.getElementById('u-password').value = '';
+  document.getElementById('u-area').value = '';
+  document.getElementById('u-rol').value = 'operario';
+  document.getElementById('u-email-noti').value = '';
+  document.getElementById('u-obs').value = '';
+  document.getElementById('u-activo').checked = true;
+  document.getElementById('u-trazabilidad').checked = false;
+  document.getElementById('modal-usuario').classList.add('open');
+}
+
+function editarUsuario(u) {
+  editUserId = u.id;
+  document.getElementById('modal-user-titulo').textContent = 'Editar usuario';
+  document.getElementById('u-nombre').value = u.nombre_completo;
+  document.getElementById('u-username').value = u.username;
+  document.getElementById('u-password').value = '';
+  document.getElementById('u-area').value = u.area || '';
+  document.getElementById('u-rol').value = u.rol;
+  document.getElementById('u-email-noti').value = u.email_notificaciones || '';
+  document.getElementById('u-obs').value = u.observaciones || '';
+  document.getElementById('u-activo').checked = u.activo;
+  document.getElementById('u-trazabilidad').checked = u.puede_ver_trazabilidad;
+  document.getElementById('modal-usuario').classList.add('open');
+}
+
+async function guardarUsuario() {
+  var nombre = document.getElementById('u-nombre').value;
+  var username = document.getElementById('u-username').value;
+  if (!nombre || !username) { alert('Nombre y usuario son obligatorios'); return; }
+  var payload = {
+    nombre_completo: nombre, username: username,
+    rol: document.getElementById('u-rol').value,
+    area: document.getElementById('u-area').value,
+    activo: document.getElementById('u-activo').checked,
+    puede_ver_trazabilidad: document.getElementById('u-trazabilidad').checked,
+    email_notificaciones: document.getElementById('u-email-noti').value,
+    observaciones: document.getElementById('u-obs').value,
+    password: document.getElementById('u-password').value,
+  };
+  var r;
+  if (editUserId) {
+    r = await api('/admin/usuarios/' + editUserId, { method: 'PUT', body: JSON.stringify(payload) });
+  } else {
+    if (!payload.password) payload.password = 'manten1234';
+    r = await api('/admin/usuarios', { method: 'POST', body: JSON.stringify(payload) });
+  }
+  if (r && r.ok) { cerrarModal(); cargarUsuarios(); alert('Usuario guardado.'); }
+  else alert('Error al guardar. ' + (r && r.detail ? r.detail : ''));
+}
+
+function cerrarModal() {
+  document.getElementById('modal-usuario').classList.remove('open');
+  editUserId = null;
+}
+
+async function cargarEquiposSelect() {
+  var r = await api('/relevador/equipos') || [];
+  var sel = document.getElementById('traz-equipo');
+  sel.innerHTML = '<option value="">Todos los equipos</option>' +
+    r.map(function(e) { return '<option value="' + e.id + '">' + e.nombre + ' (' + e.codigo_interno + ')</option>'; }).join('');
+}
+
+async function cargarTrazabilidad() {
+  document.getElementById('tbody-trazabilidad').innerHTML = '<tr><td colspan="19" class="loading">Cargando...</td></tr>';
+  var params = [];
+  var desde = document.getElementById('traz-desde').value;
+  var hasta = document.getElementById('traz-hasta').value;
+  var equipo = document.getElementById('traz-equipo').value;
+  if (desde) params.push('fecha_desde=' + desde);
+  if (hasta) params.push('fecha_hasta=' + hasta);
+  if (equipo) params.push('equipo_id=' + equipo);
+  var data = await api('/admin/trazabilidad' + (params.length ? '?' + params.join('&') : '')) || [];
+  trazData = data;
+  var tbody = document.getElementById('tbody-trazabilidad');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="19" class="empty">Sin resultados</td></tr>'; document.getElementById('resumen-traz').textContent = ''; return; }
+  var estados = {borrador:'Borrador',pendiente_rrhh:'Pend. RRHH',autorizada:'Autorizada',en_ejecucion:'En ejecución',completada:'Completada',cancelada:'Cancelada'};
+  tbody.innerHTML = data.map(function(r) {
+    return '<tr>' +
+      '<td style="font-weight:700;color:var(--cel2);">' + r.numero + '</td>' +
+      '<td><span class="badge ' + (r.estado==='completada'?'badge-ok':r.estado==='cancelada'?'badge-off':'badge-rol') + '">' + (estados[r.estado]||r.estado) + '</span></td>' +
+      '<td>' + r.equipo_nombre + '</td>' +
+      '<td style="color:var(--txt3);">' + r.equipo_codigo + '</td>' +
+      '<td>' + (r.ubicacion||'—') + '</td>' +
+      '<td>' + (r.plan_nombre||'—') + '</td>' +
+      '<td style="text-align:right;">' + (r.horometro_apertura||'—') + '</td>' +
+      '<td style="text-align:right;">' + (r.horometro_cierre||'—') + '</td>' +
+      '<td>' + r.fecha_apertura + '</td>' +
+      '<td>' + r.fecha_liberacion + '</td>' +
+      '<td>' + r.fecha_rrhh + '</td>' +
+      '<td>' + r.fecha_cierre + '</td>' +
+      '<td>' + (r.planificador||'—') + '</td>' +
+      '<td>' + (r.mecanico||'—') + '</td>' +
+      '<td>' + (r.auxiliar||'—') + '</td>' +
+      '<td>' + (r.vehiculo||'—') + '</td>' +
+      '<td style="text-align:center;">' + (r.rrhh_aprobado?'Sí':'—') + '</td>' +
+      '<td style="text-align:center;">' + (r.panol_aprobado?'Sí':'—') + '</td>' +
+      '<td style="color:var(--txt3);">' + (r.observaciones||'—') + '</td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('resumen-traz').textContent = data.length + ' registros';
+}
+
+function exportarTrazabilidad() {
+  if (!trazData.length) { alert('No hay datos para exportar'); return; }
+  var cols = ['OT','Estado','Equipo','Código','Ubicación','Plan','Hs apertura','Hs cierre','Fecha apertura','Fecha liberación','Fecha RRHH','Fecha cierre','Planificador','Mecánico','Auxiliar','Vehículo','RRHH OK','Pañol OK','Observaciones'];
+  var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>';
+  cols.forEach(function(c) { html += '<th style="background:#0d2240;color:#e8f0fc;font-weight:bold;">' + c + '</th>'; });
+  html += '</tr></thead><tbody>';
+  trazData.forEach(function(r) {
+    html += '<tr><td>' + r.numero + '</td><td>' + r.estado + '</td><td>' + r.equipo_nombre + '</td><td>' + r.equipo_codigo + '</td><td>' + (r.ubicacion||'') + '</td><td>' + (r.plan_nombre||'') + '</td><td>' + (r.horometro_apertura||'') + '</td><td>' + (r.horometro_cierre||'') + '</td><td>' + r.fecha_apertura + '</td><td>' + r.fecha_liberacion + '</td><td>' + r.fecha_rrhh + '</td><td>' + r.fecha_cierre + '</td><td>' + (r.planificador||'') + '</td><td>' + (r.mecanico||'') + '</td><td>' + (r.auxiliar||'') + '</td><td>' + (r.vehiculo||'') + '</td><td>' + (r.rrhh_aprobado?'Sí':'No') + '</td><td>' + (r.panol_aprobado?'Sí':'No') + '</td><td>' + (r.observaciones||'') + '</td></tr>';
+  });
+  html += '</tbody></table></body></html>';
+  var blob = new Blob(['\uFEFF' + html], {type:'application/vnd.ms-excel;charset=utf-8;'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'trazabilidad_' + new Date().toISOString().split('T')[0] + '.xls';
+  a.click();
+}
+
+async function cargarAccesos() {
+  var data = await api('/admin/log-accesos') || [];
+  var tbody = document.getElementById('tbody-accesos');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Sin registros</td></tr>'; return; }
+  tbody.innerHTML = data.map(function(r) {
+    return '<tr><td style="font-weight:700;">' + (r.usuario||'—') + '</td>' +
+      '<td><span class="badge badge-rol">' + r.accion + '</span></td>' +
+      '<td>' + (r.modulo||'—') + '</td>' +
+      '<td style="color:var(--txt3);">' + (r.ip||'—') + '</td>' +
+      '<td style="color:var(--txt3);">' + (r.fecha ? new Date(r.fecha).toLocaleString('es-AR') : '—') + '</td></tr>';
+  }).join('');
+}
+
+window.onclick = function(e) {
+  if (e.target === document.getElementById('modal-usuario')) cerrarModal();
+};
+
+cargarEmpresa();
+</script>
+</body>
+</html>

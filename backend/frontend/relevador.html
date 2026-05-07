@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANTEN. — Relevador</title>
+<style>
+:root{--az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;--cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;--r:14px;--r-sm:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+nav{background:var(--az2);border-bottom:0.5px solid rgba(55,138,221,0.2);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;}
+.logo{font-size:22px;font-weight:700;color:var(--cel2);letter-spacing:0.15em;margin-right:8px;}
+.rol-badge{background:var(--az3);color:var(--cel3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--cel1);}
+.nav-name{color:var(--txt2);font-size:13px;}
+.btn-nav{background:transparent;border:0.5px solid rgba(55,138,221,0.3);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
+.btn-nav:hover{background:var(--az3);color:var(--txt1);}
+.btn-nav.active{background:var(--az4);color:var(--txt1);border-color:var(--cel1);}
+.spacer{flex:1;}
+main{padding:24px;max-width:1200px;margin:0 auto;}
+h2{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
+.toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.btn{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;font-weight:700;}
+.btn:hover{background:var(--cel1);}
+.btn-ok{background:#065f46;border-color:var(--ok);}
+.btn-ok:hover{background:var(--ok);}
+.btn-danger{background:#7f1d1d;border-color:var(--danger);}
+input,select,textarea{background:var(--az1);border:0.5px solid rgba(55,138,221,0.2);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;font-style:italic;font-family:inherit;outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
+.search{max-width:300px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.card{background:var(--az2);border:0.5px solid rgba(55,138,221,0.15);border-radius:var(--r);padding:18px;cursor:pointer;transition:border-color 0.2s;}
+.card:hover{border-color:var(--cel1);}
+.card-title{font-size:16px;font-weight:700;color:var(--txt1);margin-bottom:4px;}
+.card-code{font-size:11px;color:var(--cel2);letter-spacing:0.08em;margin-bottom:8px;}
+.card-row{font-size:12px;color:var(--txt2);margin-bottom:3px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.badge-ok{background:#065f46;color:#6ee7b7;}
+.badge-off{background:#7f1d1d;color:#fca5a5;}
+.card-hs{font-size:20px;font-weight:700;color:var(--cel2);margin-top:8px;}
+.card-actions{display:flex;gap:8px;margin-top:12px;}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.3);background:var(--az3);color:var(--txt1);cursor:pointer;font-style:italic;font-family:inherit;}
+.btn-sm:hover{background:var(--az4);}
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.modal{background:var(--az2);border:0.5px solid rgba(55,138,221,0.3);border-radius:var(--r);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:16px;color:var(--cel2);margin-bottom:20px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px;}
+.foto-preview{width:100%;max-height:150px;object-fit:cover;border-radius:var(--r-sm);margin-top:8px;display:none;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<nav>
+  <span class="logo">MANTEN.</span>
+  <span class="rol-badge">Relevador</span>
+  <span class="nav-name" id="nav-name"></span>
+  <span class="spacer"></span>
+  <button class="btn-nav" onclick="salir()">Salir</button>
+</nav>
+<main>
+  <h2>Gestión de Equipos</h2>
+  <div class="toolbar">
+    <button class="btn" onclick="abrirModal()">+ Nuevo Equipo</button>
+    <input class="search" type="text" placeholder="Buscar equipo..." oninput="filtrar(this.value)">
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="modal-title">Nuevo Equipo</h3>
+    <div class="row2">
+      <div class="field"><label>Nombre *</label><input id="f-nombre" placeholder="Ej: Excavadora CAT 390"></div>
+      <div class="field"><label>Código Interno *</label><input id="f-codigo" placeholder="Ej: EQ-001"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Código SAP</label><input id="f-sap" placeholder="SAP-12345"></div>
+      <div class="field"><label>Año</label><input id="f-anio" type="number" placeholder="2020"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Marca</label><input id="f-marca" placeholder="Caterpillar"></div>
+      <div class="field"><label>Modelo</label><input id="f-modelo" placeholder="390F"></div>
+    </div>
+    <div class="row2">
+  <div class="field"><label>Ubicación</label><input id="f-ubicacion" placeholder="Planta Norte"></div>
+  <div class="field"><label>Sector</label><input id="f-sector" placeholder="Minería"></div>
+</div>
+<div class="row2">
+  <div class="field"><label>GPS Latitud</label><input id="f-lat" type="number" step="any" placeholder="-32.123456"></div>
+  <div class="field"><label>GPS Longitud</label><input id="f-lng" type="number" step="any" placeholder="-68.123456"></div>
+</div>
+    <div class="field"><label>Horómetro Inicial</label><input id="f-horo" type="number" placeholder="0"></div>
+    <div class="field"><label>Foto (PNG/JPG)</label><input type="file" id="f-foto" accept="image/*" onchange="previewFoto(this)"><img id="foto-preview" class="foto-preview"></div>
+    <div class="field"><label>Observaciones</label><textarea id="f-obs" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-sm" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-ok" onclick="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://cmms-v2-production.up.railway.app/api/v1';
+let token = localStorage.getItem('manten_token');
+let user = JSON.parse(localStorage.getItem('manten_user') || '{}');
+let equipos = [];
+let editandoId = null;
+
+if (!token) window.location.href = 'index.html';
+document.getElementById('nav-name').textContent = user.nombre_completo || '';
+
+async function api(method, path, body) {
+  const opts = { method, headers: { Authorization: 'Bearer ' + token } };
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  const r = await fetch(API + path, opts);
+  if (r.status === 401) { salir(); return; }
+  return r.json();
+}
+
+async function cargar() {
+  equipos = await api('GET', '/relevador/equipos') || [];
+  renderizar(equipos);
+}
+
+function renderizar(lista) {
+  const g = document.getElementById('grid');
+  if (!lista.length) { g.innerHTML = '<div class="empty">No hay equipos registrados</div>'; return; }
+  g.innerHTML = lista.map(e => `
+    <div class="card">
+      <div class="card-title">${e.nombre}</div>
+      <div class="card-code">${e.codigo_interno}${e.codigo_sap ? ' · ' + e.codigo_sap : ''}</div>
+      ${e.ubicacion ? `<div class="card-row">📍 ${e.ubicacion}${e.sector ? ' — ' + e.sector : ''}</div>` : ''}
+      ${e.marca ? `<div class="card-row">${e.marca} ${e.modelo || ''} ${e.anio || ''}</div>` : ''}
+      <div class="card-hs">${e.horometro_actual?.toLocaleString() || 0} hs</div>
+      <span class="badge ${e.activo ? 'badge-ok' : 'badge-off'}">${e.activo ? 'Activo' : 'Inactivo'}</span>
+      <div class="card-actions">
+        <button class="btn-sm" onclick="editar('${e.id}')">✏️ Editar</button>
+        <button class="btn-sm" onclick="verQR('${e.id}','${e.codigo_interno}','${e.nombre}')">QR</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filtrar(q) {
+  const f = equipos.filter(e =>
+    e.nombre.toLowerCase().includes(q.toLowerCase()) ||
+    e.codigo_interno.toLowerCase().includes(q.toLowerCase()) ||
+    (e.ubicacion || '').toLowerCase().includes(q.toLowerCase())
+  );
+  renderizar(f);
+}
+
+function abrirModal() {
+  editandoId = null;
+  document.getElementById('modal-title').textContent = 'Nuevo Equipo';
+  ['nombre','codigo','sap','anio','marca','modelo','ubicacion','sector','horo','obs'].forEach(f => {
+    const el = document.getElementById('f-' + f);
+    if (el) el.value = '';
+  });
+  document.getElementById('foto-preview').style.display = 'none';
+  document.getElementById('overlay').classList.add('show');
+}
+
+function editar(id) {
+  const e = equipos.find(x => x.id === id);
+  if (!e) return;
+  editandoId = id;
+  document.getElementById('modal-title').textContent = 'Editar Equipo';
+  document.getElementById('f-nombre').value = e.nombre || '';
+  document.getElementById('f-codigo').value = e.codigo_interno || '';
+  document.getElementById('f-sap').value = e.codigo_sap || '';
+  document.getElementById('f-anio').value = e.anio || '';
+  document.getElementById('f-marca').value = e.marca || '';
+  document.getElementById('f-modelo').value = e.modelo || '';
+  document.getElementById('f-ubicacion').value = e.ubicacion || '';
+  document.getElementById('f-sector').value = e.sector || '';
+  document.getElementById('f-horo').value = e.horometro_actual || '';
+  document.getElementById('f-obs').value = e.observaciones || '';
+  if (e.foto1_base64) {
+    const img = document.getElementById('foto-preview');
+    img.src = e.foto1_base64;
+    img.style.display = 'block';
+  }
+  document.getElementById('overlay').classList.add('show');
+}
+
+function cerrarModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function previewFoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('foto-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function guardar() {
+  const nombre = document.getElementById('f-nombre').value.trim();
+  const codigo = document.getElementById('f-codigo').value.trim();
+  if (!nombre || !codigo) { alert('Nombre y Código Interno son obligatorios'); return; }
+  const fotoEl = document.getElementById('f-foto');
+  let foto = null;
+  if (fotoEl.files[0]) {
+    foto = await new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(fotoEl.files[0]);
+    });
+  }
+  const payload = {
+    nombre, codigo_interno: codigo,
+    codigo_sap: document.getElementById('f-sap').value || null,
+    anio: parseInt(document.getElementById('f-anio').value) || null,
+    marca: document.getElementById('f-marca').value || null,
+    modelo: document.getElementById('f-modelo').value || null,
+    ubicacion: document.getElementById('f-ubicacion').value || null,
+    sector: document.getElementById('f-sector').value || null,
+    horometro_inicial: parseFloat(document.getElementById('f-horo').value) || 0,
+    observaciones: document.getElementById('f-obs').value || null,
+    ...(foto && { foto1_base64: foto })
+  };
+  if (editandoId) {
+    await api('PUT', `/relevador/equipos/${editandoId}`, payload);
+  } else {
+    await api('POST', '/relevador/equipos', payload);
+  }
+  cerrarModal();
+  cargar();
+}
+
+function salir() {
+  localStorage.clear();
+  window.location.href = 'index.html';
+}
+
+cargar();
+
+function verQR(id, codigo, nombre) {
+  let overlay = document.getElementById('overlay-qr');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'overlay-qr';
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;';
+    overlay.innerHTML = `<div style="background:#0d2240;border:0.5px solid rgba(55,138,221,0.3);border-radius:14px;padding:28px;text-align:center;min-width:260px;">
+      <div style="font-size:13px;color:#5ba3e8;margin-bottom:4px;font-style:italic;" id="qr-nombre"></div>
+      <div style="font-size:11px;color:#5a7fa8;margin-bottom:16px;font-style:italic;" id="qr-codigo"></div>
+      <div id="qr-canvas" style="display:inline-block;background:white;padding:12px;border-radius:8px;"></div>
+      <div style="margin-top:16px;"><button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
+      <button onclick="imprimirQR()" style="background:#2563a8;border:0.5px solid #378add;color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;margin-left:8px;">Imprimir</button></div>
+    </div>`;
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+  document.getElementById('qr-nombre').textContent = nombre;
+  document.getElementById('qr-codigo').textContent = codigo;
+  const canvas = document.getElementById('qr-canvas');
+  canvas.innerHTML = '';
+  new QRCode(canvas, { text: codigo, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.H });
+}
+
+function imprimirQR() {
+  const nombre = document.getElementById('qr-nombre').textContent;
+  const codigo = document.getElementById('qr-codigo').textContent;
+  const canvas = document.getElementById('qr-canvas').querySelector('canvas');
+  const img = canvas ? canvas.toDataURL() : '';
+  const w = window.open('', '_blank');
+  w.document.write(`<html><body style="text-align:center;font-family:Arial Narrow,Arial,sans-serif;padding:20px;">
+    <div style="font-size:18px;font-weight:bold;">${nombre}</div>
+    <div style="font-size:13px;color:#666;margin-bottom:12px;">${codigo}</div>
+    <img src="${img}" style="width:200px;height:200px;">
+    <script>window.onload=()=>{window.print();window.close();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+</script>
+</body>
+</html>
