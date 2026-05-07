@@ -48,3 +48,9 @@ async def health():
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
 
+
+from app.api.v1.endpoints import planificador_routes
+app.include_router(planificador_routes.router, prefix="/api/v1")
+
+from app.api.v1.endpoints import planificador_routes
+app.include_router(planificador_routes.router, prefix="/api/v1")
