@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Operador — MANTEN.</title>
+<style>
+:root{
+  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
+  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;
+  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+.topbar{background:var(--az2);border-bottom:0.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:18px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;}
+.role-pill{background:rgba(37,99,168,0.25);color:var(--cel2);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(91,163,232,0.3);}
+.user-name{color:var(--txt2);font-size:12px;}
+.btn-salir{background:none;border:0.5px solid var(--border);color:#d8e8f5;font-size:12px;padding:6px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
+.main{padding:16px 20px;max-width:600px;margin:0 auto;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin:16px 0 10px;}
+.card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.btn{font-size:13px;padding:10px 18px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(37,99,168,0.15);color:var(--cel3);cursor:pointer;font-style:italic;font-family:inherit;width:100%;text-align:center;}
+.btn:hover{border-color:var(--cel1);color:var(--cel2);}
+.btn-primary{background:var(--az4);border-color:var(--cel1);color:var(--txt1);}
+.btn-ok{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:var(--ok);font-weight:700;font-size:14px;padding:14px;}
+.btn-danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--danger);}
+.btn-warn{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--warn);}
+.btn-row{display:flex;gap:10px;}
+.btn-row .btn{flex:1;}
+.badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
+.badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
+.badge-warn{background:rgba(245,158,11,0.1);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
+.badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
+.badge-urgente{background:rgba(239,68,68,0.2);color:#ff6b6b;border:0.5px solid rgba(239,68,68,0.4);font-weight:700;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.fg label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;}
+.fg input,.fg select,.fg textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:14px;padding:10px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cel1);}
+.fg select option{background:var(--az2);}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
+.info-row:last-child{border-bottom:none;}
+.info-label{color:var(--txt3);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;}
+.divider{border:none;border-top:0.5px solid var(--border);margin:12px 0;}
+.empty{color:var(--txt3);font-size:13px;padding:24px;text-align:center;}
+.loading{color:var(--txt3);font-size:13px;padding:16px;text-align:center;}
+
+/* Checklist items */
+.check-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.check-item:last-child{border-bottom:none;}
+.check-item.checked .check-box{background:var(--ok);border-color:var(--ok);}
+.check-item.checked .check-label{text-decoration:line-through;color:var(--txt3);}
+.check-box{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:var(--az1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.check-label{flex:1;font-size:13px;}
+.check-meta{font-size:11px;color:var(--txt3);}
+
+/* Pantallas */
+.screen{display:none;}.screen.act{display:block;}
+
+/* QR input grande */
+.qr-input{font-size:18px;padding:14px;text-align:center;letter-spacing:0.1em;}
+
+/* Progreso */
+.progreso{background:rgba(37,99,168,0.1);border-radius:20px;height:6px;margin:8px 0;}
+.progreso-bar{background:var(--ok);border-radius:20px;height:6px;transition:width 0.3s;}
+
+.alert-box{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;}
+.alert-ok{background:rgba(16,185,129,0.1);border:0.5px solid rgba(16,185,129,0.3);color:var(--ok);}
+.alert-warn{background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="logo">MANTEN.</span>
+    <span class="role-pill">Operador</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="user-name" id="user-name"></span>
+    <button class="btn-salir" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ═══ PANTALLA INICIO ═══ -->
+  <div class="screen act" id="screen-inicio">
+    <div class="section-title">¿Qué querés hacer?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" onclick="mostrar('screen-escanear')">
+        📷 Escanear QR / Buscar equipo
+      </button>
+      <button class="btn btn-warn" onclick="mostrar('screen-correctiva')">
+        ⚠ Reportar falla o rotura
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ PANTALLA ESCANEAR ═══ -->
+  <div class="screen" id="screen-escanear">
+    <div class="section-title">Buscar OT activa</div>
+    <div class="card">
+      <div class="fg">
+        <label>Código interno del equipo</label>
+        <input type="text" id="input-codigo" class="qr-input"
+          placeholder="Ej: CF CAT 938"
+          onkeydown="if(event.key==='Enter') buscarOT()">
+      </div>
+      <button class="btn btn-primary" onclick="buscarOT()">Buscar OT</button>
+    </div>
+    <div id="resultado-busqueda"></div>
+    <div style="margin-top:12px;">
+      <button class="btn" onclick="mostrar('screen-inicio')">← Volver</button>
+    </div>
+  </div>
+
+  <!-- ═══ PANTALLA CHECKLIST ═══ -->
+  <div class="screen" id="screen-checklist">
+    <div id="ot-header"></div>
+    <div class="section-title">Materiales del servicio</div>
+    <div class="card" id="checklist-container"></div>
+    <div id="progreso-wrap" style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:4px;">
+        <span>Progreso</span><span id="progreso-txt">0 / 0</span>
+      </div>
+      <div class="progreso"><div class="progreso-bar" id="progreso-bar" style="width:0%"></div></div>
+    </div>
+    <div id="seccion-cierre" style="display:none;">
+      <div class="alert-box alert-ok">✓ Todos los materiales marcados. Podés cerrar la OT.</div>
+      <div class="card">
+        <div class="fg">
+          <label>Horómetro actual <span style="color:var(--danger);">*</span></label>
+          <input type="number" id="horometro-cierre" placeholder="Ingresá las horas actuales" class="qr-input">
+        </div>
+        <div class="fg">
+          <label>Observaciones de cierre</label>
+          <textarea id="obs-cierre" rows="2" placeholder="Opcional..."></textarea>
+        </div>
+        <button class="btn btn-ok" onclick="cerrarOT()">✓ Cerrar OT</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn" onclick="mostrar('screen-escanear')">← Buscar otra OT</button>
+    </div>
+  </div>
+
+  <!-- ═══ PANTALLA CORRECTIVA ═══ -->
+  <div class="screen" id="screen-correctiva">
+    <div class="section-title">Reportar falla o rotura</div>
+    <div class="card">
+      <div class="fg">
+        <label>Equipo afectado <span style="color:var(--danger);">*</span></label>
+        <select id="sol-equipo">
+          <option value="">Seleccioná el equipo...</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Descripción del problema <span style="color:var(--danger);">*</span></label>
+        <textarea id="sol-descripcion" rows="3" placeholder="Describí la falla o rotura..."></textarea>
+      </div>
+      <div class="fg">
+        <label>Urgencia</label>
+        <select id="sol-urgente">
+          <option value="false">Normal</option>
+          <option value="true">Urgente — equipo fuera de servicio</option>
+        </select>
+      </div>
+      <button class="btn btn-danger" onclick="enviarSolicitud()">⚠ Enviar reporte al planificador</button>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn" onclick="mostrar('screen-inicio')">← Volver</button>
+    </div>
+  </div>
+
+  <!-- ═══ PANTALLA CIERRE EXITOSO ═══ -->
+  <div class="screen" id="screen-exito">
+    <div class="card" style="text-align:center;padding:32px 16px;">
+      <div style="font-size:48px;margin-bottom:16px;">✅</div>
+      <div style="font-size:18px;font-weight:700;color:var(--ok);margin-bottom:8px;">OT cerrada</div>
+      <div id="exito-numero" style="font-size:14px;color:var(--txt2);margin-bottom:24px;"></div>
+      <div style="font-size:12px;color:var(--txt3);">
+        El planificador recibió el aviso de cierre.<br>
+        El pañol recibió el pedido preventivo para el próximo servicio.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="mostrar('screen-inicio')">Volver al inicio</button>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://cmms-v2-production.up.railway.app/api/v1';
+const TOKEN = localStorage.getItem('manten_token');
+const USER = JSON.parse(localStorage.getItem('manten_user') || '{}');
+
+if (!TOKEN) window.location.href = 'index.html';
+if (USER.nombre_completo) document.getElementById('user-name').textContent = USER.nombre_completo;
+
+let otActual = null;
+let checklist = {};
+
+async function api(path, opts={}) {
+  const r = await fetch(API + path, {
+    headers: {'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json',...(opts.headers||{})},
+    ...opts
+  });
+  if (r.status===401) { logout(); return null; }
+  if (!r.ok) {
+    const e = await r.json().catch(()=>({}));
+    throw new Error(e.detail || 'Error en el servidor');
+  }
+  return r.json();
+}
+
+function logout() {
+  localStorage.removeItem('manten_token');
+  localStorage.removeItem('manten_user');
+  window.location.href = 'index.html';
+}
+
+function mostrar(screenId) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('act'));
+  document.getElementById(screenId).classList.add('act');
+}
+
+// ─── BUSCAR OT ─────────────────────────────────────────────────────
+
+async function buscarOT() {
+  const codigo = document.getElementById('input-codigo').value.trim();
+  if (!codigo) { alert('Ingresá el código del equipo'); return; }
+
+  document.getElementById('resultado-busqueda').innerHTML = '<div class="loading">Buscando...</div>';
+  try {
+    const ot = await api('/operador/ot-por-equipo/'+encodeURIComponent(codigo));
+    document.getElementById('resultado-busqueda').innerHTML = `
+      <div class="card">
+        <div style="margin-bottom:12px;">
+          <span style="font-size:16px;font-weight:700;color:var(--cel2);">${ot.numero}</span>
+          <span class="badge ${ot.tipo==='correctiva'?'badge-warn':'badge-rol'}" style="margin-left:8px;">${ot.tipo}</span>
+          ${ot.urgente?'<span class="badge badge-urgente" style="margin-left:4px;">URGENTE</span>':''}
+        </div>
+        <div class="info-row"><span class="info-label">Equipo</span><span>${ot.equipo_nombre}</span></div>
+        <div class="info-row"><span class="info-label">Plan</span><span>${ot.plan_nombre}</span></div>
+        <div class="info-row"><span class="info-label">Horómetro actual</span><span>${ot.horometro_actual} hs</span></div>
+        <div class="info-row"><span class="info-label">Mecánico</span><span>${ot.mecanico_nombre||'—'}</span></div>
+        <div class="info-row"><span class="info-label">Materiales</span><span>${ot.materiales.length} ítems</span></div>
+        <div style="margin-top:14px;">
+          <button class="btn btn-primary" onclick='abrirChecklist(${JSON.stringify(ot).replace(/'/g,"&#39;")})'>
+            → Abrir checklist
+          </button>
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('resultado-busqueda').innerHTML =
+      '<div class="card" style="border-color:rgba(239,68,68,0.3);"><div style="color:var(--danger);font-size:13px;">'+e.message+'</div></div>';
+  }
+}
+
+// ─── CHECKLIST ─────────────────────────────────────────────────────
+
+async function abrirChecklist(ot) {
+  otActual = ot;
+  checklist = ot.checklist || {};
+
+  // Iniciar ejecución
+  try {
+    await api('/operador/ot/'+ot.id+'/iniciar', {method:'POST', body:JSON.stringify({})});
+  } catch(e) { /* ya estaba en ejecución, ok */ }
+
+  // Header
+  document.getElementById('ot-header').innerHTML = `
+    <div class="card" style="margin-bottom:0;border-radius:var(--r) var(--r) 0 0;border-bottom:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="font-size:15px;font-weight:700;color:var(--cel2);">${ot.numero}</span>
+          <span style="font-size:12px;color:var(--txt3);margin-left:8px;">${ot.equipo_nombre}</span>
+        </div>
+        <span class="badge ${ot.tipo==='correctiva'?'badge-warn':'badge-rol'}">${ot.tipo}</span>
+      </div>
+    </div>
+  `;
+
+  // Render checklist
+  renderChecklist();
+  mostrar('screen-checklist');
+}
+
+function renderChecklist() {
+  const cont = document.getElementById('checklist-container');
+  const mats = otActual.materiales;
+
+  if (!mats.length) {
+    cont.innerHTML = '<div class="empty">Sin materiales en esta OT</div>';
+    document.getElementById('seccion-cierre').style.display = 'block';
+    return;
+  }
+
+  cont.innerHTML = mats.map(m => {
+    const tildado = checklist[m.id] === true;
+    return `
+      <div class="check-item ${tildado?'checked':''}" onclick="toggleItem('${m.id}')" id="ci-${m.id}">
+        <div class="check-box">${tildado?'✓':''}</div>
+        <div style="flex:1;">
+          <div class="check-label">${m.descripcion}</div>
+          <div class="check-meta">${m.cantidad} ${m.unidad} ${m.tipo==='extra'?'<span class="badge badge-warn" style="font-size:9px;">extra</span>':''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  actualizarProgreso();
+}
+
+function toggleItem(matId) {
+  checklist[matId] = !checklist[matId];
+
+  const el = document.getElementById('ci-'+matId);
+  const box = el.querySelector('.check-box');
+  if (checklist[matId]) {
+    el.classList.add('checked');
+    box.textContent = '✓';
+  } else {
+    el.classList.remove('checked');
+    box.textContent = '';
+  }
+
+  actualizarProgreso();
+
+  // Guardar en servidor
+  api('/operador/ot/'+otActual.id+'/checklist', {
+    method: 'PUT',
+    body: JSON.stringify({checklist})
+  }).catch(()=>{});
+}
+
+function actualizarProgreso() {
+  const total = otActual.materiales.length;
+  const tildados = Object.values(checklist).filter(v=>v===true).length;
+  const pct = total > 0 ? Math.round(tildados/total*100) : 100;
+
+  document.getElementById('progreso-txt').textContent = tildados + ' / ' + total;
+  document.getElementById('progreso-bar').style.width = pct + '%';
+
+  const seccion = document.getElementById('seccion-cierre');
+  if (tildados >= total) {
+    seccion.style.display = 'block';
+  } else {
+    seccion.style.display = 'none';
+  }
+}
+
+// ─── CERRAR OT ─────────────────────────────────────────────────────
+
+async function cerrarOT() {
+  const horometro = parseFloat(document.getElementById('horometro-cierre').value);
+  if (!horometro || horometro <= 0) { alert('Ingresá el horómetro actual'); return; }
+  if (horometro < (otActual.horometro_apertura || 0)) {
+    if (!confirm('El horómetro ingresado es menor al de apertura. ¿Confirmás?')) return;
+  }
+  if (!confirm('¿Confirmar cierre de OT ' + otActual.numero + '?')) return;
+
+  try {
+    const r = await api('/operador/ot/'+otActual.id+'/cerrar', {
+      method: 'POST',
+      body: JSON.stringify({
+        horometro_cierre: horometro,
+        checklist: checklist,
+        observaciones_cierre: document.getElementById('obs-cierre').value.trim(),
+      })
+    });
+    document.getElementById('exito-numero').textContent = 'OT ' + r.numero + ' cerrada correctamente.';
+    otActual = null;
+    checklist = {};
+    mostrar('screen-exito');
+  } catch(e) {
+    alert('Error al cerrar: ' + e.message);
+  }
+}
+
+// ─── SOLICITUD CORRECTIVA ──────────────────────────────────────────
+
+async function cargarEquipos() {
+  try {
+    const equipos = await api('/operador/equipos') || [];
+    const sel = document.getElementById('sol-equipo');
+    sel.innerHTML = '<option value="">Seleccioná el equipo...</option>' +
+      equipos.map(e=>`<option value="${e.id}">${e.nombre} (${e.codigo_interno})</option>`).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function enviarSolicitud() {
+  const equipoId = document.getElementById('sol-equipo').value;
+  const desc = document.getElementById('sol-descripcion').value.trim();
+  const urgente = document.getElementById('sol-urgente').value === 'true';
+  if (!equipoId) { alert('Seleccioná el equipo'); return; }
+  if (!desc) { alert('Describí el problema'); return; }
+
+  try {
+    await api('/operador/solicitud-correctiva', {
+      method: 'POST',
+      body: JSON.stringify({equipo_id: equipoId, descripcion: desc, urgente})
+    });
+    alert('✓ Reporte enviado al planificador.');
+    document.getElementById('sol-equipo').value = '';
+    document.getElementById('sol-descripcion').value = '';
+    document.getElementById('sol-urgente').value = 'false';
+    mostrar('screen-inicio');
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// Init
+cargarEquipos();
+</script>
+</body>
+</html>
