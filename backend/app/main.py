@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from app.db.session import engine, Base
 from app.db.models import *
 from app.core.security import hash_password
@@ -51,6 +50,3 @@ from app.api.v1.endpoints import panol_routes
 app.include_router(panol_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import operador_routes
 app.include_router(operador_routes.router, prefix="/api/v1")
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-app.mount("/app", StaticFiles(directory=os.path.join(BASE_DIR, "frontend"), html=True), name="frontend")
