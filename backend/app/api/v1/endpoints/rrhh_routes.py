@@ -126,8 +126,8 @@ async def rrhh_cargar_datos(
             mecanico_nombre    = :mecanico,
             auxiliar_nombre    = :auxiliar,
             cantidad_personal  = :cp,
-            epp_items          = :epp::jsonb,
-            documentos_rrhh    = :docs::jsonb,
+            epp_items          = CAST(:epp AS jsonb),
+            documentos_rrhh    = CAST(:docs AS jsonb),
             observaciones      = :obs
         WHERE id = :id
     """), {
