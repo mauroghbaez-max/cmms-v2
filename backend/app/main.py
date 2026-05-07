@@ -5,9 +5,7 @@ from app.db.models import *
 from app.core.security import hash_password
 from sqlalchemy import text
 import os
-
 app = FastAPI(title="MANTEN. v2.0", version="2.0.0")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +13,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 @app.on_event("startup")
 async def startup():
     print("Iniciando MANTEN. v2.0...", flush=True)
@@ -35,25 +32,14 @@ async def startup():
                 print("Admin creado — user: admin / pass: admin1234", flush=True)
         except Exception as e:
             print(f"Error startup: {e}", flush=True)
-
 @app.get("/")
 async def root():
     return {"sistema": "MANTEN. v2.0", "estado": "operativo"}
-
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-from fastapi import Request
-from fastapi.responses import JSONResponse
-
-@app.options("/{rest:path}")
-async def options_handler(rest: str):
-    return JSONResponse(content={}, headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Headers": "*"})
-
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
-
 from app.api.v1.endpoints import planificador_routes
 app.include_router(planificador_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import rrhh_routes
