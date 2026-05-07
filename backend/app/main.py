@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.db.session import engine, Base
 from app.db.models import *
 from app.core.security import hash_password
 from sqlalchemy import text
 import os
+
 app = FastAPI(title="MANTEN. v2.0", version="2.0.0")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,6 +16,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.on_event("startup")
 async def startup():
     print("Iniciando MANTEN. v2.0...", flush=True)
@@ -32,12 +36,11 @@ async def startup():
                 print("Admin creado — user: admin / pass: admin1234", flush=True)
         except Exception as e:
             print(f"Error startup: {e}", flush=True)
-@app.get("/")
-async def root():
-    return {"sistema": "MANTEN. v2.0", "estado": "operativo"}
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import planificador_routes
@@ -48,3 +51,5 @@ from app.api.v1.endpoints import panol_routes
 app.include_router(panol_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import operador_routes
 app.include_router(operador_routes.router, prefix="/api/v1")
+
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
