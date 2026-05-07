@@ -69,11 +69,20 @@ class PlanMantenimiento(Base):
     equipo_id = Column(UUID(as_uuid=False), ForeignKey("equipos.id"), nullable=False)
     nombre = Column(String(200), nullable=False)
     horas_hito = Column(Float, nullable=False)
-    horas_alerta = Column(Float, default=150)
+    horas_alerta = Column(Float, default=150)   # hs antes del servicio para aviso amarillo
     cantidad_personal = Column(Integer, default=1)
     observaciones = Column(Text)
     activo = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # --- Auditoría de modificaciones/eliminaciones ---
+    modificado_por_id = Column(UUID(as_uuid=False), ForeignKey("usuarios.id"), nullable=True)
+    modificado_por_nombre = Column(String(200), nullable=True)
+    motivo_modificacion = Column(Text, nullable=True)       # observación obligatoria al modificar
+    fecha_modificacion = Column(DateTime(timezone=True), nullable=True)
+    eliminado = Column(Boolean, default=False)              # soft delete: no se borra físicamente
+    motivo_eliminacion = Column(Text, nullable=True)        # observación obligatoria al eliminar
+    eliminado_por_nombre = Column(String(200), nullable=True)
+    fecha_eliminacion = Column(DateTime(timezone=True), nullable=True)
     equipo = relationship("Equipo", back_populates="planes")
     materiales = relationship("PlanMaterial", back_populates="plan", cascade="all, delete-orphan")
     ordenes = relationship("OrdenTrabajo", back_populates="plan")
@@ -100,6 +109,10 @@ class Horometro(Base):
     es_correccion = Column(Boolean, default=False)
     lectura_original = Column(Float)
     motivo_correccion = Column(Text)
+    # Quién hizo la corrección y desde qué rol
+    # horometrista: solo puede corregir carga del día actual, sin observación obligatoria
+    # planificador/admin: pueden corregir cualquier fecha, con observación obligatoria
+    corregido_por_rol = Column(String(50), nullable=True)
     observaciones = Column(Text)
     equipo = relationship("Equipo", back_populates="horometros")
 
@@ -108,8 +121,16 @@ class OrdenTrabajo(Base):
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     numero = Column(String(20), unique=True, nullable=False)
     equipo_id = Column(UUID(as_uuid=False), ForeignKey("equipos.id"), nullable=False)
-    plan_id = Column(UUID(as_uuid=False), ForeignKey("planes_mantenimiento.id"))
+    plan_id = Column(UUID(as_uuid=False), ForeignKey("planes_mantenimiento.id"), nullable=True)
     planificador_id = Column(UUID(as_uuid=False), ForeignKey("usuarios.id"))
+    # --- NUEVO: tipo de OT ---
+    # 'preventiva': servicio programado por horas (500hs, 1000hs, etc.)
+    # 'correctiva': equipo roto o falla, puede no estar en hora
+    tipo = Column(String(20), default="preventiva", nullable=False)
+    # --- NUEVO: urgencia (solo para correctivas) ---
+    urgente = Column(Boolean, default=False)
+    # Si es correctiva, referencia a la solicitud que la originó (puede ser null si la generó directo el planificador)
+    solicitud_correctiva_id = Column(UUID(as_uuid=False), ForeignKey("solicitudes_correctivas.id"), nullable=True)
     estado = Column(String(50), default="borrador")
     descripcion = Column(Text)
     vehiculo_traslado = Column(String(200))
@@ -140,6 +161,32 @@ class OrdenTrabajo(Base):
     materiales = relationship("OTMaterial", back_populates="ot", cascade="all, delete-orphan")
     entregas = relationship("PanolEntrega", back_populates="ot")
     auditoria = relationship("OTAuditoria", back_populates="ot")
+    solicitud_correctiva = relationship("SolicitudCorrectiva", back_populates="ot", foreign_keys=[solicitud_correctiva_id])
+
+class SolicitudCorrectiva(Base):
+    """
+    Tabla para solicitudes de OT correctiva iniciadas por operario u horometrista.
+    El planificador las revisa y decide si genera la OT.
+    """
+    __tablename__ = "solicitudes_correctivas"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    equipo_id = Column(UUID(as_uuid=False), ForeignKey("equipos.id"), nullable=False)
+    solicitante_id = Column(UUID(as_uuid=False), ForeignKey("usuarios.id"), nullable=False)
+    solicitante_nombre = Column(String(200))
+    solicitante_rol = Column(String(50))        # 'operario' o 'horometrista'
+    descripcion = Column(Text, nullable=False)  # descripción del problema
+    urgente = Column(Boolean, default=False)
+    # Estado del ciclo de vida de la solicitud
+    # 'pendiente': esperando que el planificador la atienda
+    # 'aprobada': planificador generó la OT
+    # 'rechazada': planificador la descartó
+    estado = Column(String(20), default="pendiente")
+    motivo_rechazo = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    equipo = relationship("Equipo")
+    solicitante = relationship("Usuario", foreign_keys=[solicitante_id])
+    ot = relationship("OrdenTrabajo", back_populates="solicitud_correctiva", foreign_keys="OrdenTrabajo.solicitud_correctiva_id")
 
 class OTMaterial(Base):
     __tablename__ = "ot_materiales"
@@ -159,7 +206,7 @@ class PanolEntrega(Base):
     __tablename__ = "panol_entregas"
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     ot_id = Column(UUID(as_uuid=False), ForeignKey("ordenes_trabajo.id"), nullable=False)
-    tipo = Column(String(50), default="material")
+    tipo = Column(String(50), default="material")   # 'material' o 'epp'
     codigo_sap = Column(String(100))
     descripcion = Column(String(300), nullable=False)
     cantidad = Column(Float, default=1)
