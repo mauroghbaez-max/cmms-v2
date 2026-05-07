@@ -14,7 +14,6 @@ nav{background:var(--az2);border-bottom:0.5px solid rgba(55,138,221,0.2);padding
 .nav-name{color:var(--txt2);font-size:13px;}
 .btn-nav{background:transparent;border:0.5px solid rgba(55,138,221,0.3);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
 .btn-nav:hover{background:var(--az3);color:var(--txt1);}
-.btn-nav.active{background:var(--az4);color:var(--txt1);border-color:var(--cel1);}
 .spacer{flex:1;}
 main{padding:24px;max-width:1200px;margin:0 auto;}
 h2{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
@@ -40,7 +39,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
 .card-actions{display:flex;gap:8px;margin-top:12px;}
 .btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.3);background:var(--az3);color:var(--txt1);cursor:pointer;font-style:italic;font-family:inherit;}
 .btn-sm:hover{background:var(--az4);}
-/* Modal */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
 .overlay.show{display:flex;}
 .modal{background:var(--az2);border:0.5px solid rgba(55,138,221,0.3);border-radius:var(--r);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
@@ -51,6 +49,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 .empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px;}
 .foto-preview{width:100%;max-height:150px;object-fit:cover;border-radius:var(--r-sm);margin-top:8px;display:none;}
+.btn-gps{background:var(--az3);border:0.5px solid var(--cel1);color:var(--cel2);padding:7px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;width:100%;margin-bottom:8px;}
+.btn-gps:hover{background:var(--az4);}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -88,13 +88,18 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
       <div class="field"><label>Modelo</label><input id="f-modelo" placeholder="390F"></div>
     </div>
     <div class="row2">
-  <div class="field"><label>Ubicación</label><input id="f-ubicacion" placeholder="Planta Norte"></div>
-  <div class="field"><label>Sector</label><input id="f-sector" placeholder="Minería"></div>
-</div>
-<div class="row2">
-  <div class="field"><label>GPS Latitud</label><input id="f-lat" type="number" step="any" placeholder="-32.123456"></div>
-  <div class="field"><label>GPS Longitud</label><input id="f-lng" type="number" step="any" placeholder="-68.123456"></div>
-</div>
+      <div class="field"><label>Ubicación</label><input id="f-ubicacion" placeholder="Planta Norte"></div>
+      <div class="field"><label>Sector</label><input id="f-sector" placeholder="Minería"></div>
+    </div>
+    <div class="field">
+      <label>GPS</label>
+      <button type="button" class="btn-gps" onclick="detectarGPS()">📍 Detectar ubicación automática</button>
+      <div id="gps-status" style="font-size:11px;color:var(--txt3);margin-bottom:6px;"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>GPS Latitud</label><input id="f-lat" type="number" step="any" placeholder="-32.123456"></div>
+      <div class="field"><label>GPS Longitud</label><input id="f-lng" type="number" step="any" placeholder="-68.123456"></div>
+    </div>
     <div class="field"><label>Horómetro Inicial</label><input id="f-horo" type="number" placeholder="0"></div>
     <div class="field"><label>Foto (PNG/JPG)</label><input type="file" id="f-foto" accept="image/*" onchange="previewFoto(this)"><img id="foto-preview" class="foto-preview"></div>
     <div class="field"><label>Observaciones</label><textarea id="f-obs" rows="2"></textarea></div>
@@ -159,10 +164,11 @@ function filtrar(q) {
 function abrirModal() {
   editandoId = null;
   document.getElementById('modal-title').textContent = 'Nuevo Equipo';
-  ['nombre','codigo','sap','anio','marca','modelo','ubicacion','sector','horo','obs'].forEach(f => {
+  ['nombre','codigo','sap','anio','marca','modelo','ubicacion','sector','horo','obs','lat','lng'].forEach(f => {
     const el = document.getElementById('f-' + f);
     if (el) el.value = '';
   });
+  document.getElementById('gps-status').textContent = '';
   document.getElementById('foto-preview').style.display = 'none';
   document.getElementById('overlay').classList.add('show');
 }
@@ -182,6 +188,9 @@ function editar(id) {
   document.getElementById('f-sector').value = e.sector || '';
   document.getElementById('f-horo').value = e.horometro_actual || '';
   document.getElementById('f-obs').value = e.observaciones || '';
+  document.getElementById('f-lat').value = e.gps_lat || '';
+  document.getElementById('f-lng').value = e.gps_lng || '';
+  document.getElementById('gps-status').textContent = '';
   if (e.foto1_base64) {
     const img = document.getElementById('foto-preview');
     img.src = e.foto1_base64;
@@ -206,6 +215,30 @@ function previewFoto(input) {
   reader.readAsDataURL(file);
 }
 
+function detectarGPS() {
+  const status = document.getElementById('gps-status');
+  if (!navigator.geolocation) {
+    status.style.color = 'var(--danger)';
+    status.textContent = 'GPS no disponible en este dispositivo';
+    return;
+  }
+  status.style.color = 'var(--txt3)';
+  status.textContent = 'Detectando ubicación...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      document.getElementById('f-lat').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('f-lng').value = pos.coords.longitude.toFixed(6);
+      status.style.color = 'var(--ok)';
+      status.textContent = '✓ Ubicación detectada correctamente';
+    },
+    err => {
+      status.style.color = 'var(--danger)';
+      status.textContent = 'No se pudo obtener la ubicación. Ingresala manualmente.';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
 async function guardar() {
   const nombre = document.getElementById('f-nombre').value.trim();
   const codigo = document.getElementById('f-codigo').value.trim();
@@ -228,6 +261,8 @@ async function guardar() {
     ubicacion: document.getElementById('f-ubicacion').value || null,
     sector: document.getElementById('f-sector').value || null,
     horometro_inicial: parseFloat(document.getElementById('f-horo').value) || 0,
+    gps_lat: parseFloat(document.getElementById('f-lat').value) || null,
+    gps_lng: parseFloat(document.getElementById('f-lng').value) || null,
     observaciones: document.getElementById('f-obs').value || null,
     ...(foto && { foto1_base64: foto })
   };
@@ -257,8 +292,10 @@ function verQR(id, codigo, nombre) {
       <div style="font-size:13px;color:#5ba3e8;margin-bottom:4px;font-style:italic;" id="qr-nombre"></div>
       <div style="font-size:11px;color:#5a7fa8;margin-bottom:16px;font-style:italic;" id="qr-codigo"></div>
       <div id="qr-canvas" style="display:inline-block;background:white;padding:12px;border-radius:8px;"></div>
-      <div style="margin-top:16px;"><button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
-      <button onclick="imprimirQR()" style="background:#2563a8;border:0.5px solid #378add;color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;margin-left:8px;">Imprimir</button></div>
+      <div style="margin-top:16px;">
+        <button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
+        <button onclick="imprimirQR()" style="background:#2563a8;border:0.5px solid #378add;color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;margin-left:8px;">Imprimir</button>
+      </div>
     </div>`;
     document.body.appendChild(overlay);
   }
