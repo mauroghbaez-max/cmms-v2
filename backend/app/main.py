@@ -44,6 +44,13 @@ async def root():
 async def health():
     return {"status": "ok"}
 
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+@app.options("/{rest:path}")
+async def options_handler(rest: str):
+    return JSONResponse(content={}, headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Headers": "*"})
+
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
 
