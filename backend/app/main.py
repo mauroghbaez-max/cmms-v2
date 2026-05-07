@@ -10,7 +10,7 @@ app = FastAPI(title="MANTEN. v2.0", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*", "https://bucolic-frangipane-798714.netlify.app"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
