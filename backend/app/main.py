@@ -10,8 +10,8 @@ app = FastAPI(title="MANTEN. v2.0", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*", "http://localhost:8080", "http://127.0.0.1:8080"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -22,7 +22,6 @@ async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("Tablas OK", flush=True)
-
     from app.db.session import AsyncSessionLocal
     async with AsyncSessionLocal() as db:
         try:
@@ -47,10 +46,6 @@ async def health():
 
 from app.api.v1.endpoints import routes
 app.include_router(routes.router, prefix="/api/v1")
-
-
-from app.api.v1.endpoints import planificador_routes
-app.include_router(planificador_routes.router, prefix="/api/v1")
 
 from app.api.v1.endpoints import planificador_routes
 app.include_router(planificador_routes.router, prefix="/api/v1")
