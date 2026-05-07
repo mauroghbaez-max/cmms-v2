@@ -45,5 +45,6 @@ app.include_router(planificador_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import rrhh_routes
 app.include_router(rrhh_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import panol_routes
-app.include_router(panol_routes.router, prefix="/api/v1")from app.api.v1.endpoints import operador_routes
+app.include_router(panol_routes.router, prefix="/api/v1")
+from app.api.v1.endpoints import operador_routes
 app.include_router(operador_routes.router, prefix="/api/v1")
