@@ -196,14 +196,15 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
-                             foto1_base64, activo, observaciones, relevador_id)
+                             foto1_base64, qr_code, activo, observaciones, relevador_id)
         VALUES (:id, :nombre, :ci, :cs, :ubi, :sector, :marca, :modelo, :anio,
-                :h0, :h0, :foto, :activo, :obs, :rid)
+                :h0, :h0, :foto, :qr, :activo, :obs, :rid)
     """), {"id": eid, "nombre": payload["nombre"], "ci": payload["codigo_interno"],
            "cs": payload.get("codigo_sap"), "ubi": payload.get("ubicacion"),
            "sector": payload.get("sector"), "marca": payload.get("marca"),
            "modelo": payload.get("modelo"), "anio": payload.get("anio"),
            "h0": payload.get("horometro_inicial", 0), "foto": payload.get("foto1_base64"),
+           "qr": payload.get("qr_code"),
            "activo": payload.get("activo", True), "obs": payload.get("observaciones"),
            "rid": current_user["id"]})
     await db.commit()
