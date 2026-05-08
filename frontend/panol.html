@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,11 +32,11 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .btn-primary{background:var(--az4);border-color:var(--cel1);color:var(--txt1);}
 .btn-ok{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--ok);}
 .btn-ok:hover{background:rgba(16,185,129,0.2);}
+.btn-warn{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--warn);}
 .btn-sm{font-size:11px;padding:4px 10px;}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
 .badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
-.badge-off{background:rgba(239,68,68,0.1);color:var(--danger);border:0.5px solid rgba(239,68,68,0.3);}
 .badge-warn{background:rgba(245,158,11,0.1);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
 .badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
 .badge-urgente{background:rgba(239,68,68,0.2);color:#ff6b6b;border:0.5px solid rgba(239,68,68,0.4);font-weight:700;}
@@ -49,10 +50,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .modal{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;}
 .modal-title{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--cel2);}
 .divider{border:none;border-top:0.5px solid var(--border);margin:14px 0;}
-.item-entrega{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
-.item-entrega:last-child{border-bottom:none;}
-.item-check{width:20px;height:20px;border-radius:4px;border:0.5px solid var(--border);background:var(--az1);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.item-check.checked{background:var(--ok);border-color:var(--ok);}
 .empty{color:var(--txt3);font-size:13px;padding:24px;text-align:center;}
 .loading{color:var(--txt3);font-size:13px;padding:16px;text-align:center;}
 .counter{font-size:11px;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;margin-left:6px;}
@@ -62,6 +59,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .fg input:focus,.fg textarea:focus{border-color:var(--cel1);}
 .orden-card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
 .orden-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.acciones-grupo{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -81,7 +79,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 
 <div class="main">
 
-<!-- ═══ ÓRDENES PENDIENTES ═══ -->
 <div class="panel act" id="panel-ordenes">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
     <div class="section-title" style="margin:0;">Órdenes de entrega pendientes</div>
@@ -90,7 +87,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   <div id="contenedor-ordenes"><div class="loading">Cargando...</div></div>
 </div>
 
-<!-- ═══ PEDIDOS PREVENTIVOS ═══ -->
 <div class="panel" id="panel-preventivos">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
     <div class="section-title" style="margin:0;">Pedidos preventivos — próximos servicios</div>
@@ -101,16 +97,14 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 
 </div>
 
-<!-- ═══ MODAL ENTREGA ═══ -->
+<!-- MODAL ENTREGA -->
 <div class="modal-bg" id="modal-entrega">
   <div class="modal">
     <div class="modal-title" id="entrega-titulo">Confirmar entrega</div>
     <input type="hidden" id="entrega-ot-id">
     <input type="hidden" id="entrega-tipo">
-
     <div id="entrega-items"></div>
     <hr class="divider">
-
     <div class="fg" style="margin-bottom:14px;">
       <label>Nombre del operador que retira <span style="color:var(--danger);">*</span></label>
       <input type="text" id="entrega-firma" placeholder="Nombre y apellido">
@@ -162,24 +156,16 @@ function setPanel(nombre, el) {
   if (nombre==='preventivos') cargarPreventivos();
 }
 
-// ─── ÓRDENES ───────────────────────────────────────────────────────
-
 async function cargarOrdenes() {
   document.getElementById('contenedor-ordenes').innerHTML = '<div class="loading">Cargando...</div>';
   try {
     const data = await api('/panol/ordenes') || [];
     const cont = document.getElementById('contenedor-ordenes');
-
-    // Actualizar counter en nav
     const btn = document.getElementById('btn-ordenes');
     const counter = btn.querySelector('.counter');
     if (counter) counter.remove();
     if (data.length) btn.innerHTML = 'Órdenes<span class="counter">'+data.length+'</span>';
-
-    if (!data.length) {
-      cont.innerHTML = '<div class="empty">Sin órdenes pendientes</div>';
-      return;
-    }
+    if (!data.length) { cont.innerHTML = '<div class="empty">Sin órdenes pendientes</div>'; return; }
 
     cont.innerHTML = data.map(o => `
       <div class="orden-card">
@@ -197,14 +183,11 @@ async function cargarOrdenes() {
           <div class="section-title" style="margin-bottom:8px;">EPP a entregar</div>
           <table class="tbl">
             <thead><tr><th>Descripción</th><th>Cantidad</th><th>Unidad</th></tr></thead>
-            <tbody>
-              ${o.items_epp.map(i=>`<tr><td>${i.descripcion}</td><td>${i.cantidad}</td><td>${i.unidad}</td></tr>`).join('')}
-            </tbody>
+            <tbody>${o.items_epp.map(i=>`<tr><td>${i.descripcion}</td><td>${i.cantidad}</td><td>${i.unidad}</td></tr>`).join('')}</tbody>
           </table>
-          <div style="margin-top:8px;">
-            <button class="btn btn-ok btn-sm" onclick='abrirEntrega("${o.ot_id}","epp","${o.ot_numero} — EPP")'>
-              ✓ Confirmar entrega EPP
-            </button>
+          <div class="acciones-grupo">
+            <button class="btn btn-warn btn-sm" onclick='imprimirOrden("${o.ot_id}","${o.ot_numero}","${o.equipo_nombre}","epp",${JSON.stringify(o.items_epp).replace(/"/g,"&quot;")})'>🖨 Imprimir orden EPP</button>
+            <button class="btn btn-ok btn-sm" onclick='abrirEntrega("${o.ot_id}","epp","${o.ot_numero} — EPP")'>✓ Confirmar entrega EPP</button>
           </div>
         </div>` : ''}
 
@@ -213,22 +196,17 @@ async function cargarOrdenes() {
           <div class="section-title" style="margin-bottom:8px;">Materiales a entregar</div>
           <table class="tbl">
             <thead><tr><th>Descripción</th><th>Cantidad</th><th>Unidad</th></tr></thead>
-            <tbody>
-              ${o.items_material.map(i=>`<tr><td>${i.descripcion}</td><td>${i.cantidad}</td><td>${i.unidad}</td></tr>`).join('')}
-            </tbody>
+            <tbody>${o.items_material.map(i=>`<tr><td>${i.descripcion}</td><td>${i.cantidad}</td><td>${i.unidad}</td></tr>`).join('')}</tbody>
           </table>
-          <div style="margin-top:8px;">
-            <button class="btn btn-ok btn-sm" onclick='abrirEntrega("${o.ot_id}","material","${o.ot_numero} — Materiales")'>
-              ✓ Confirmar entrega materiales
-            </button>
+          <div class="acciones-grupo">
+            <button class="btn btn-warn btn-sm" onclick='imprimirOrden("${o.ot_id}","${o.ot_numero}","${o.equipo_nombre}","material",${JSON.stringify(o.items_material).replace(/"/g,"&quot;")})'>🖨 Imprimir orden materiales</button>
+            <button class="btn btn-ok btn-sm" onclick='abrirEntrega("${o.ot_id}","material","${o.ot_numero} — Materiales")'>✓ Confirmar entrega materiales</button>
           </div>
         </div>` : ''}
 
         ${o.items_epp.length && o.items_material.length ? `
         <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);">
-          <button class="btn btn-primary btn-sm" onclick='abrirEntrega("${o.ot_id}","ambos","${o.ot_numero} — Todo")'>
-            ✓ Confirmar entrega completa (EPP + materiales)
-          </button>
+          <button class="btn btn-primary btn-sm" onclick='abrirEntrega("${o.ot_id}","ambos","${o.ot_numero} — Todo")'>✓ Confirmar entrega completa</button>
         </div>` : ''}
       </div>
     `).join('');
@@ -237,19 +215,12 @@ async function cargarOrdenes() {
   }
 }
 
-// ─── PREVENTIVOS ───────────────────────────────────────────────────
-
 async function cargarPreventivos() {
   document.getElementById('contenedor-preventivos').innerHTML = '<div class="loading">Cargando...</div>';
   try {
     const data = await api('/panol/pedidos-preventivos') || [];
     const cont = document.getElementById('contenedor-preventivos');
-
-    if (!data.length) {
-      cont.innerHTML = '<div class="empty">Sin pedidos preventivos recientes</div>';
-      return;
-    }
-
+    if (!data.length) { cont.innerHTML = '<div class="empty">Sin pedidos preventivos recientes</div>'; return; }
     cont.innerHTML = data.map(p => `
       <div class="orden-card">
         <div class="orden-header">
@@ -264,14 +235,7 @@ async function cargarPreventivos() {
         </div>
         <table class="tbl">
           <thead><tr><th>Código SAP</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th></tr></thead>
-          <tbody>
-            ${p.materiales.map(m=>`<tr>
-              <td style="color:var(--txt3);">${m.codigo_sap||'—'}</td>
-              <td>${m.descripcion}</td>
-              <td>${m.cantidad}</td>
-              <td>${m.unidad}</td>
-            </tr>`).join('')}
-          </tbody>
+          <tbody>${p.materiales.map(m=>`<tr><td style="color:var(--txt3);">${m.codigo_sap||'—'}</td><td>${m.descripcion}</td><td>${m.cantidad}</td><td>${m.unidad}</td></tr>`).join('')}</tbody>
         </table>
       </div>
     `).join('');
@@ -280,8 +244,69 @@ async function cargarPreventivos() {
   }
 }
 
-// ─── MODAL ENTREGA ─────────────────────────────────────────────────
+// ─── IMPRIMIR ORDEN ────────────────────────────────────────────────
+function imprimirOrden(otId, otNumero, equipoNombre, tipo, items) {
+  const titulo = tipo === 'epp' ? 'ORDEN DE ENTREGA DE EPP' : 'ORDEN DE ENTREGA DE MATERIALES';
+  const duplicado = tipo === 'epp'; // EPP se imprime por duplicado
+  const fecha = new Date().toLocaleString('es-AR');
 
+  const tablaItems = items.map(i => `
+    <tr>
+      <td>${i.descripcion}</td>
+      <td style="text-align:center;">${i.cantidad}</td>
+      <td style="text-align:center;">${i.unidad}</td>
+      <td style="width:60px;"></td>
+    </tr>
+  `).join('');
+
+  const cuerpo = `
+    <div style="border:1px solid #333;padding:20px;margin-bottom:${duplicado?'40px':'0'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-size:20px;font-weight:bold;">MANTEN.</div>
+          <div style="font-size:14px;font-weight:bold;margin-top:4px;">${titulo}</div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:#555;">
+          <div>OT: <strong>${otNumero}</strong></div>
+          <div>Equipo: <strong>${equipoNombre}</strong></div>
+          <div>Fecha: ${fecha}</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+        <thead>
+          <tr style="background:#0d2240;color:#fff;">
+            <th style="padding:8px;text-align:left;">Descripción</th>
+            <th style="padding:8px;text-align:center;width:80px;">Cantidad</th>
+            <th style="padding:8px;text-align:center;width:60px;">Unidad</th>
+            <th style="padding:8px;text-align:center;width:60px;">✓</th>
+          </tr>
+        </thead>
+        <tbody>${tablaItems}</tbody>
+      </table>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:24px;">
+        <div>
+          <div style="border-top:1px solid #333;padding-top:8px;font-size:11px;color:#555;">Entregado por (Pañol)</div>
+        </div>
+        <div>
+          <div style="border-top:1px solid #333;padding-top:8px;font-size:11px;color:#555;">Recibido por (Operador) — Firma y aclaración</div>
+        </div>
+      </div>
+      ${duplicado ? '<div style="text-align:center;margin-top:16px;font-size:10px;color:#888;">DUPLICADO</div>' : ''}
+    </div>
+  `;
+
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${titulo}</title>
+  <style>body{font-family:Arial Narrow,Arial,sans-serif;padding:24px;color:#111;}@media print{button{display:none;}}</style>
+  </head><body>
+  ${cuerpo}
+  ${duplicado ? cuerpo.replace('DUPLICADO', 'ORIGINAL') : ''}
+  <br><button onclick="window.print()" style="padding:8px 20px;background:#2563a8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">🖨 Imprimir</button>
+  </body></html>`);
+  w.document.close();
+}
+
+// ─── MODAL ENTREGA ─────────────────────────────────────────────────
 function abrirEntrega(otId, tipo, titulo) {
   document.getElementById('entrega-ot-id').value = otId;
   document.getElementById('entrega-tipo').value = tipo;
@@ -289,8 +314,7 @@ function abrirEntrega(otId, tipo, titulo) {
   document.getElementById('entrega-firma').value = '';
   document.getElementById('entrega-obs').value = '';
   document.getElementById('entrega-items').innerHTML =
-    '<div class="alert-box" style="background:rgba(37,99,168,0.1);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--txt2);margin-bottom:14px;">'+
-    'Al confirmar, se registra la entrega y el operador queda como receptor. Esta acción no se puede deshacer.</div>';
+    '<div style="background:rgba(37,99,168,0.1);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--txt2);margin-bottom:14px;">Al confirmar, se registra la entrega. Esta acción no se puede deshacer.</div>';
   document.getElementById('modal-entrega').classList.add('open');
 }
 
@@ -299,48 +323,26 @@ async function confirmarEntrega() {
   const tipo = document.getElementById('entrega-tipo').value;
   const firma = document.getElementById('entrega-firma').value.trim();
   if (!firma) { alert('El nombre del operador es obligatorio'); return; }
-
   try {
     await api('/panol/entregas/'+otId+'/confirmar', {
       method: 'POST',
-      body: JSON.stringify({
-        tipo,
-        firma_operario: firma,
-        observaciones: document.getElementById('entrega-obs').value.trim(),
-      })
+      body: JSON.stringify({ tipo, firma_operario: firma, observaciones: document.getElementById('entrega-obs').value.trim() })
     });
     alert('✓ Entrega confirmada.');
     cerrarModal();
     cargarOrdenes();
-  } catch(e) {
-    alert('Error: ' + e.message);
-  }
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 async function verDetalleOT(otId) {
   try {
     const ot = await api('/panol/ots/'+otId);
-    const estados = {borrador:'Borrador',pendiente_rrhh:'Pend. RRHH',autorizada:'Autorizada',en_ejecucion:'En ejecución',completada:'Completada'};
-    alert(
-      'OT: ' + ot.numero + '\n' +
-      'Equipo: ' + ot.equipo_nombre + '\n' +
-      'Mecánico: ' + (ot.mecanico_nombre||'—') + '\n' +
-      'Personal: ' + (ot.cantidad_personal||'—') + '\n' +
-      'Vehículo: ' + (ot.vehiculo_traslado||'—') + '\n' +
-      'Estado: ' + (estados[ot.estado]||ot.estado)
-    );
-  } catch(e) {
-    alert('Error: '+e.message);
-  }
+    alert('OT: '+ot.numero+'\nEquipo: '+ot.equipo_nombre+'\nMecánico: '+(ot.mecanico_nombre||'—')+'\nPersonal: '+(ot.cantidad_personal||'—')+'\nVehículo: '+(ot.vehiculo_traslado||'—'));
+  } catch(e) { alert('Error: '+e.message); }
 }
 
-function cerrarModal() {
-  document.getElementById('modal-entrega').classList.remove('open');
-}
-
-window.onclick = e => {
-  if (e.target === document.getElementById('modal-entrega')) cerrarModal();
-};
+function cerrarModal() { document.getElementById('modal-entrega').classList.remove('open'); }
+window.onclick = e => { if (e.target === document.getElementById('modal-entrega')) cerrarModal(); };
 
 cargarOrdenes();
 </script>
