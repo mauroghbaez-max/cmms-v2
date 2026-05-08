@@ -5,10 +5,19 @@ from sqlalchemy import text
 from app.db.session import get_db
 from app.core.security import verify_password, create_access_token, decode_token
 from app.db.models import Usuario
-import json
+import json, qrcode, io, base64
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+def generar_qr_base64(texto: str) -> str:
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(texto)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode()
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> dict:
     payload = decode_token(token)
@@ -193,6 +202,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
         raise HTTPException(400, "Código interno ya existe")
     import uuid
     eid = str(uuid.uuid4())
+    qr_base64 = generar_qr_base64(payload["codigo_interno"])
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
@@ -204,7 +214,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
            "sector": payload.get("sector"), "marca": payload.get("marca"),
            "modelo": payload.get("modelo"), "anio": payload.get("anio"),
            "h0": payload.get("horometro_inicial", 0), "foto": payload.get("foto1_base64"),
-           "qr": payload.get("qr_code"),
+           "qr": qr_base64,
            "activo": payload.get("activo", True), "obs": payload.get("observaciones"),
            "rid": current_user["id"]})
     await db.commit()
@@ -212,6 +222,16 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
 
 @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
+    # Regenerar QR si se cambia el codigo_interno
+    if "codigo_interno" in payload:
+        payload["qr_code"] = generar_qr_base64(payload["codigo_interno"])
+    elif "qr_code" not in payload:
+        # Siempre regenerar QR al editar usando el codigo_interno actual
+        result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
+        equipo = result.fetchone()
+        if equipo:
+            payload["qr_code"] = generar_qr_base64(equipo.codigo_interno)
+
     sets, params = [], {"id": equipo_id}
     for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio", "activo", "observaciones", "foto1_base64", "qr_code"]:
         if campo in payload:
