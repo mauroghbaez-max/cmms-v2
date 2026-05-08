@@ -457,6 +457,30 @@ async def imprimir_ot(
             estado = 'autorizada'
         WHERE id = :id
     """), {"id": ot_id})
+
+    # Crear entradas en panol_entregas para los materiales de la OT
+    mats_r = await db.execute(text("""
+        SELECT codigo_sap, descripcion, cantidad, unidad
+        FROM ot_materiales WHERE ot_id = :oid
+    """), {"oid": ot_id})
+    for m in mats_r.fetchall():
+        await db.execute(text("""
+            INSERT INTO panol_entregas
+                (id, ot_id, tipo, codigo_sap, descripcion, cantidad, unidad,
+                 entregado_por_id, entregado_por_nombre)
+            VALUES
+                (gen_random_uuid(), :oid, 'material', :cs, :desc, :cant, :un,
+                 :uid, :unombre)
+        """), {
+            "oid":     ot_id,
+            "cs":      m.codigo_sap,
+            "desc":    m.descripcion,
+            "cant":    m.cantidad,
+            "un":      m.unidad,
+            "uid":     current_user["id"],
+            "unombre": current_user["nombre_completo"],
+        })
+
     await db.commit()
     return {"ok": True}
 
