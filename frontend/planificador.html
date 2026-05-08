@@ -753,10 +753,13 @@ async function verDetalleOT(otId) {
       </table>`:''}
     `;
     const acciones = document.getElementById('detalle-ot-acciones');
-    if (o.rrhh_aprobado) {
+    if (o.rrhh_aprobado && o.estado !== 'completada') {
       acciones.innerHTML = `<button class="btn btn-ok" onclick='imprimirOT("${o.id}","${o.numero}")'>🖨 Imprimir OT</button>`;
     }
-    acciones.innerHTML += `<button class="btn" onclick='cerrarModal("modal-detalle-ot")'>Cerrar</button>`;
+    if (o.estado === 'completada') {
+      acciones.innerHTML = `<button class="btn btn-ok" onclick='imprimirCierreOT("${o.id}")'>🖨 Imprimir cierre OT</button>`;
+    }
+    ACCIONES.INNERHTML += `<BUTTON CLASS="BTN" ONCLICK='CERRARMODAL("MODAL-DETALLE-OT")'>Cerrar</button>`;
   } catch(e) {
     document.getElementById('detalle-ot-body').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
   }
@@ -953,6 +956,59 @@ api('/planificador/solicitudes-correctivas?estado=pendiente').then(data => {
     btn.innerHTML = 'Solicitudes<span class="counter">'+data.length+'</span>';
   }
 }).catch(()=>{});
+async function imprimirCierreOT(otId) {
+  try {
+    const o = await api('/planificador/ots/'+otId+'/detalle');
+    const limpiar = s => s ? s.replace(/\t/g, ' ').replace(/  +/g, ' ') : '—';
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Cierre OT ${o.numero}</title>
+    <style>
+      body{font-family:Arial Narrow,Arial,sans-serif;padding:24px;color:#111;font-size:13px;}
+      h1{font-size:20px;margin-bottom:4px;}
+      .sub{color:#555;font-size:12px;margin-bottom:20px;}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+      .item label{display:block;font-size:10px;text-transform:uppercase;color:#888;margin-bottom:2px;}
+      .item span{font-size:13px;font-weight:bold;}
+      table{width:100%;border-collapse:collapse;margin-top:16px;}
+      th{background:#0d2240;color:#fff;padding:8px;text-align:left;font-size:11px;}
+      td{padding:8px;border-bottom:1px solid #ddd;font-size:12px;}
+      .footer{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+      .firma{border-top:1px solid #333;padding-top:8px;font-size:11px;color:#555;}
+      .badge-completada{display:inline-block;background:#065f46;color:#6ee7b7;padding:3px 10px;border-radius:10px;font-size:11px;}
+      @media print{button{display:none;}}
+    </style></head><body>
+    <h1>CIERRE DE ORDEN DE TRABAJO — ${o.numero}</h1>
+    <div class="sub">${o.tipo.toUpperCase()} ${o.urgente?'— URGENTE':''} &nbsp;|&nbsp; <span class="badge-completada">COMPLETADA</span></div>
+    <div class="grid">
+      <div class="item"><label>Equipo</label><span>${o.equipo_nombre}</span></div>
+      <div class="item"><label>Código interno</label><span>${o.codigo_interno}</span></div>
+      <div class="item"><label>Plan</label><span>${o.plan_nombre}</span></div>
+      <div class="item"><label>Mecánico responsable</label><span>${o.mecanico_nombre||'—'}</span></div>
+      <div class="item"><label>Horómetro apertura</label><span>${o.horometro_apertura||'—'} hs</span></div>
+      <div class="item"><label>Horómetro cierre</label><span style="color:#10b981;font-size:16px;">${o.horometro_cierre||'—'} hs</span></div>
+      <div class="item"><label>Fecha y hora de inicio</label><span>${o.fecha_apertura}</span></div>
+      <div class="item"><label>Fecha y hora de cierre</label><span>${o.fecha_cierre}</span></div>
+      ${o.descripcion?`<div class="item" style="grid-column:1/-1"><label>Descripción del trabajo</label><span>${o.descripcion}</span></div>`:''}
+    </div>
+    <b>Materiales utilizados</b>
+    <table>
+      <thead><tr><th>Código SAP</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th><th>Cambiado</th></tr></thead>
+      <tbody>
+        ${o.materiales.map(m=>`<tr><td>${m.codigo_sap||'—'}</td><td>${limpiar(m.descripcion)}</td><td>${m.cantidad}</td><td>${m.unidad}</td><td style="text-align:center;color:#10b981;font-size:16px;">✓</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="footer">
+      <div class="firma">Firma mecánico responsable</div>
+      <div class="firma">Firma supervisor / planificador</div>
+    </div>
+    <div style="margin-top:24px;font-size:10px;color:#aaa;">Generado el ${new Date().toLocaleString('es-AR')} — MANTEN. Sistema de Mantenimiento Industrial</div>
+    <br><button onclick="window.print()" style="padding:8px 20px;background:#2563a8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">🖨 Imprimir / Guardar PDF</button>
+    </body></html>`);
+    w.document.close();
+  } catch(e) { alert('Error: '+e.message); }
+}
+
 </script>
 </body>
 </html>
