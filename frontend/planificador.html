@@ -84,6 +84,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     <button class="nav-btn" onclick="setPanel('planes',this)">Planes</button>
     <button class="nav-btn" onclick="setPanel('ots',this)">OTs</button>
     <button class="nav-btn" id="btn-solicitudes" onclick="setPanel('solicitudes',this)">Solicitudes</button>
+    <button class="nav-btn" onclick="setPanel('equipos',this)">Equipos</button>
   </div>
   <button class="btn-salir" onclick="logout()">Salir</button>
 </div>
@@ -188,6 +189,23 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
+
+<!-- EQUIPOS -->
+<div class="panel" id="panel-equipos">
+  <div class="row" style="justify-content:space-between;margin-bottom:14px;">
+    <div class="section-title" style="margin:0;">Equipos registrados</div>
+    <button class="btn" onclick="cargarEquiposTodos()">↺ Actualizar</button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead><tr>
+        <th>Nombre</th><th>Código</th><th>SAP</th><th>Marca / Modelo</th>
+        <th>Ubicación</th><th>Sector</th><th>Horómetro</th><th>Planes</th><th>Estado</th>
+      </tr></thead>
+      <tbody id="tbody-equipos"><tr><td colspan="9" class="loading">Cargando...</td></tr></tbody>
+    </table>
+  </div>
+</div>
 </div>
 
 <!-- MODALES -->
@@ -389,6 +407,7 @@ function setPanel(nombre, el) {
   if (nombre==='planes') cargarEquiposSelect();
   if (nombre==='ots') cargarOTs();
   if (nombre==='solicitudes') cargarSolicitudes();
+  if (nombre==='equipos') cargarEquiposTodos();
 }
 
 // REPORTE
@@ -947,6 +966,37 @@ window.guardarOT = function() {
     _guardarOT();
   }
 };
+
+
+async function cargarEquiposTodos() {
+  document.getElementById('tbody-equipos').innerHTML = '<tr><td colspan="9" class="loading">Cargando...</td></tr>';
+  try {
+    const equipos = await api('/planificador/equipos') || [];
+    if (!equipos.length) {
+      document.getElementById('tbody-equipos').innerHTML = '<tr><td colspan="9" class="empty">Sin equipos registrados</td></tr>';
+      return;
+    }
+    // Para cada equipo traer sus planes
+    const rows = await Promise.all(equipos.map(async e => {
+      let planes = [];
+      try { planes = await api('/planificador/planes/' + e.id) || []; } catch(err) {}
+      return { ...e, planes };
+    }));
+    document.getElementById('tbody-equipos').innerHTML = rows.map(e => `<tr>
+      <td style="font-weight:700;">${e.nombre}</td>
+      <td style="color:var(--cel2);font-size:11px;">${e.codigo_interno}</td>
+      <td style="color:var(--txt3);font-size:11px;">${e.codigo_sap||'—'}</td>
+      <td style="color:var(--txt3);">${e.marca||''}  ${e.modelo||''}</td>
+      <td>${e.ubicacion||'—'}</td>
+      <td>${e.sector||'—'}</td>
+      <td style="text-align:right;font-weight:700;color:var(--cel2);">${e.horometro_actual||0} hs</td>
+      <td style="text-align:center;">${e.planes.length ? '<span class="badge badge-ok">'+e.planes.length+' plan(es)</span>' : '<span class="badge badge-off">Sin planes</span>'}</td>
+      <td>${e.activo ? '<span class="badge badge-ok">Activo</span>' : '<span class="badge badge-off">Inactivo</span>'}</td>
+    </tr>`).join('');
+  } catch(e) {
+    document.getElementById('tbody-equipos').innerHTML = '<tr><td colspan="9" class="empty">Error: '+e.message+'</td></tr>';
+  }
+}
 
 // Init
 cargarReporte();
