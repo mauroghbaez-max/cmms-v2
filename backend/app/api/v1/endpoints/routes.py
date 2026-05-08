@@ -212,7 +212,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
 @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
     sets, params = [], {"id": equipo_id}
-    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio", "activo", "observaciones", "foto1_base64"]:
+    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio", "activo", "observaciones", "foto1_base64", "qr_code"]:
         if campo in payload:
             sets.append(f"{campo} = :{campo}")
             params[campo] = payload[campo]
