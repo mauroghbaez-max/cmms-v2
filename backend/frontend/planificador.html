@@ -27,7 +27,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin:18px 0 10px;}
 .card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
 .fg{display:flex;flex-direction:column;gap:5px;}
 .fg label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;}
 .fg input,.fg select,.fg textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;}
@@ -91,7 +90,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 
 <div class="main">
 
-<!-- ═══ REPORTE HORÓMETROS ═══ -->
+<!-- REPORTE -->
 <div class="panel act" id="panel-reporte">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
     <div class="row" style="gap:10px;">
@@ -122,7 +121,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- ═══ PLANES ═══ -->
+<!-- PLANES -->
 <div class="panel" id="panel-planes">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
     <div class="row" style="gap:10px;">
@@ -138,7 +137,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   <div id="contenedor-planes"><div class="empty">Seleccioná un equipo para ver sus planes</div></div>
 </div>
 
-<!-- ═══ OTs ═══ -->
+<!-- OTs -->
 <div class="panel" id="panel-ots">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
     <div class="row" style="gap:10px;">
@@ -169,7 +168,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- ═══ SOLICITUDES CORRECTIVAS ═══ -->
+<!-- SOLICITUDES -->
 <div class="panel" id="panel-solicitudes">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
     <select id="filtro-estado-sol" onchange="cargarSolicitudes()" style="background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 12px;font-style:italic;font-family:inherit;">
@@ -191,9 +190,8 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 
 </div>
 
-<!-- ═══ MODALES ═══ -->
+<!-- MODALES -->
 
-<!-- Modal historial -->
 <div class="modal-bg" id="modal-historial">
   <div class="modal modal-lg">
     <div class="modal-title" id="historial-titulo">Historial de servicios</div>
@@ -207,7 +205,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal plan -->
 <div class="modal-bg" id="modal-plan">
   <div class="modal modal-lg">
     <div class="modal-title" id="plan-titulo">Nuevo plan de mantenimiento</div>
@@ -229,7 +226,7 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
     <div id="tabla-materiales-plan"></div>
     <hr class="divider">
-    <div class="fg" style="margin-bottom:14px;" id="fg-motivo-plan" style="display:none;">
+    <div class="fg" style="margin-bottom:14px;" id="fg-motivo-plan">
       <label>Motivo de modificación <span style="color:var(--danger);">*</span></label>
       <textarea id="plan-motivo" rows="2" placeholder="Explicá el motivo del cambio..."></textarea>
     </div>
@@ -240,7 +237,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal eliminar plan -->
 <div class="modal-bg" id="modal-eliminar-plan">
   <div class="modal">
     <div class="modal-title">Eliminar plan</div>
@@ -257,7 +253,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal nueva OT -->
 <div class="modal-bg" id="modal-ot">
   <div class="modal modal-lg">
     <div class="modal-title">Nueva orden de trabajo</div>
@@ -312,7 +307,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal detalle OT -->
 <div class="modal-bg" id="modal-detalle-ot">
   <div class="modal modal-lg">
     <div class="modal-title" id="detalle-ot-titulo">Detalle OT</div>
@@ -321,7 +315,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal rechazar solicitud -->
 <div class="modal-bg" id="modal-rechazar">
   <div class="modal">
     <div class="modal-title">Rechazar solicitud</div>
@@ -337,7 +330,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- Modal corrección horómetro -->
 <div class="modal-bg" id="modal-correccion">
   <div class="modal">
     <div class="modal-title">Corregir horómetro</div>
@@ -399,8 +391,7 @@ function setPanel(nombre, el) {
   if (nombre==='solicitudes') cargarSolicitudes();
 }
 
-// ─── REPORTE ───────────────────────────────────────────────────────
-
+// REPORTE
 async function cargarReporte() {
   document.getElementById('tbody-reporte').innerHTML = '<tr><td colspan="11" class="loading">Cargando...</td></tr>';
   try {
@@ -479,8 +470,7 @@ async function verHistorial(equipoId, nombre) {
   }
 }
 
-// ─── PLANES ───────────────────────────────────────────────────────
-
+// PLANES
 async function cargarEquiposSelect() {
   try {
     equipos = await api('/planificador/equipos') || [];
@@ -657,8 +647,7 @@ async function confirmarEliminarPlan() {
   } catch(e) { alert('Error: '+e.message); }
 }
 
-// ─── OTs ──────────────────────────────────────────────────────────
-
+// OTs
 async function cargarOTs() {
   document.getElementById('tbody-ots').innerHTML = '<tr><td colspan="9" class="loading">Cargando...</td></tr>';
   const estado = document.getElementById('filtro-estado-ot').value;
@@ -677,7 +666,10 @@ async function cargarOTs() {
           <td style="text-align:center;">${o.rrhh_aprobado?'<span style="color:var(--ok)">✓</span>':'—'}</td>
           <td style="color:var(--txt3);">${o.fecha_apertura}</td>
           <td style="text-align:right;">${o.horometro_apertura||'—'} hs</td>
-          <td><button class="btn btn-sm" onclick='verDetalleOT("${o.id}")'>Ver</button>${!o.liberada_por_planificador&&o.rrhh_aprobado?'<button class="btn btn-sm btn-ok" style="margin-left:4px;" onclick=\'imprimirOT("'+o.id+'","'+o.numero+'")\'>Imprimir</button>':''}</td>
+          <td>
+            <button class="btn btn-sm" onclick='verDetalleOT("${o.id}")'>Ver</button>
+            ${o.rrhh_aprobado?'<button class="btn btn-sm btn-ok" style="margin-left:4px;" onclick=\'imprimirOT("'+o.id+'","'+o.numero+'")\'>Imprimir</button>':''}
+          </td>
         </tr>`).join('')
       : '<tr><td colspan="9" class="empty">Sin órdenes de trabajo</td></tr>';
   } catch(e) {
@@ -756,38 +748,84 @@ async function verDetalleOT(otId) {
       ${o.materiales.length?`
       <div class="section-title">Materiales</div>
       <table class="tbl" style="font-size:11px;">
-        <thead><tr><th>SAP</th><th>Descripción</th><th>Cant.</th><th>Unidad</th><th>Tipo</th></tr></thead>
-        <tbody>${o.materiales.map(m=>`<tr><td style="color:var(--txt3);">${m.codigo_sap||'—'}</td><td>${m.descripcion}</td><td>${m.cantidad}</td><td>${m.unidad}</td><td><span class="badge ${m.tipo==='extra'?'badge-warn':'badge-rol'}">${m.tipo}</span></td></tr>`).join('')}</tbody>
+        <thead><tr><th>SAP</th><th>Descripción</th><th>Cant.</th><th>Unidad</th></tr></thead>
+        <tbody>${o.materiales.map(m=>`<tr><td style="color:var(--txt3);">${m.codigo_sap||'—'}</td><td>${m.descripcion}</td><td>${m.cantidad}</td><td>${m.unidad}</td></tr>`).join('')}</tbody>
       </table>`:''}
     `;
     const acciones = document.getElementById('detalle-ot-acciones');
-    if (!o.liberada_por_planificador && o.rrhh_aprobado) {
-      acciones.innerHTML = `<button class="btn btn-ok" onclick='imprimirOT("${o.id}","${o.numero}")'>Imprimir OT</button>`;
+    if (o.rrhh_aprobado) {
+      acciones.innerHTML = `<button class="btn btn-ok" onclick='imprimirOT("${o.id}","${o.numero}")'>🖨 Imprimir OT</button>`;
     }
-    acciones.innerHTML += '<button class="btn" onclick=\'cerrarModal("modal-detalle-ot")\'>Cerrar</button>';
+    acciones.innerHTML += `<button class="btn" onclick='cerrarModal("modal-detalle-ot")'>Cerrar</button>`;
   } catch(e) {
     document.getElementById('detalle-ot-body').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
   }
 }
 
 async function imprimirOT(otId, numero) {
-  if (!confirm('¿Confirmar impresión de '+numero+'? Esto liberará la orden de materiales al Pañol.')) return;
   try {
+    // Marcar como impresa en el sistema (libera materiales al pañol)
     await api('/planificador/ots/'+otId+'/imprimir', {method:'POST', body:JSON.stringify({})});
-    alert('OT impresa. Orden de materiales liberada al Pañol.');
+
+    // Obtener datos completos para imprimir
+    const o = await api('/planificador/ots/'+otId+'/detalle');
+
+    // Abrir ventana de impresión
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>OT ${o.numero}</title>
+    <style>
+      body{font-family:Arial Narrow,Arial,sans-serif;padding:24px;color:#111;font-size:13px;}
+      h1{font-size:20px;margin-bottom:4px;}
+      .sub{color:#555;font-size:12px;margin-bottom:20px;}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+      .item label{display:block;font-size:10px;text-transform:uppercase;color:#888;margin-bottom:2px;}
+      .item span{font-size:13px;font-weight:bold;}
+      table{width:100%;border-collapse:collapse;margin-top:16px;}
+      th{background:#0d2240;color:#fff;padding:8px;text-align:left;font-size:11px;}
+      td{padding:8px;border-bottom:1px solid #ddd;font-size:12px;}
+      .footer{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+      .firma{border-top:1px solid #333;padding-top:8px;font-size:11px;color:#555;}
+      @media print{button{display:none;}}
+    </style></head><body>
+    <h1>ORDEN DE TRABAJO — ${o.numero}</h1>
+    <div class="sub">${o.tipo.toUpperCase()} ${o.urgente?'— URGENTE':''}</div>
+    <div class="grid">
+      <div class="item"><label>Equipo</label><span>${o.equipo_nombre}</span></div>
+      <div class="item"><label>Código</label><span>${o.codigo_interno}</span></div>
+      <div class="item"><label>Plan</label><span>${o.plan_nombre}</span></div>
+      <div class="item"><label>Horómetro apertura</label><span>${o.horometro_apertura||'—'} hs</span></div>
+      <div class="item"><label>Mecánico</label><span>${o.mecanico_nombre||'—'}</span></div>
+      <div class="item"><label>Fecha apertura</label><span>${o.fecha_apertura}</span></div>
+      ${o.descripcion?`<div class="item" style="grid-column:1/-1"><label>Descripción</label><span>${o.descripcion}</span></div>`:''}
+    </div>
+    <b>Materiales</b>
+    <table>
+      <thead><tr><th>Código SAP</th><th>Descripción</th><th>Cantidad</th><th>Unidad</th><th>✓</th></tr></thead>
+      <tbody>
+        ${o.materiales.map(m=>`<tr><td>${m.codigo_sap||'—'}</td><td>${m.descripcion}</td><td>${m.cantidad}</td><td>${m.unidad}</td><td style="width:40px;"></td></tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="footer">
+      <div class="firma">Firma mecánico responsable</div>
+      <div class="firma">Firma supervisor</div>
+    </div>
+    <div style="margin-top:24px;font-size:10px;color:#aaa;">Generado el ${new Date().toLocaleString('es-AR')} — MANTEN. Sistema de Mantenimiento Industrial</div>
+    <br><button onclick="window.print()" style="padding:8px 20px;background:#2563a8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;">🖨 Imprimir / Guardar PDF</button>
+    </body></html>`);
+    w.document.close();
+
     cerrarModal('modal-detalle-ot');
     cargarOTs();
   } catch(e) { alert('Error: '+e.message); }
 }
 
-// ─── SOLICITUDES ──────────────────────────────────────────────────
-
+// SOLICITUDES
 async function cargarSolicitudes() {
   document.getElementById('tbody-solicitudes').innerHTML = '<tr><td colspan="7" class="loading">Cargando...</td></tr>';
   const estado = document.getElementById('filtro-estado-sol').value;
   try {
     const data = await api('/planificador/solicitudes-correctivas?estado='+estado) || [];
-    // Actualizar contador de pendientes en el nav
     if (estado==='pendiente') {
       const btn = document.getElementById('btn-solicitudes');
       const counter = btn.querySelector('.counter');
@@ -814,7 +852,6 @@ async function cargarSolicitudes() {
 }
 
 async function aprobarSolicitud(solId, equipoNombre) {
-  // Abrir modal de nueva OT con la solicitud pre-cargada como correctiva
   await cargarEquiposSelect();
   document.getElementById('ot-tipo').value = 'correctiva';
   toggleTipoOT();
@@ -824,7 +861,6 @@ async function aprobarSolicitud(solId, equipoNombre) {
 }
 
 async function guardarOTConSolicitud() {
-  // Se reutiliza guardarOT pero agrega el solicitud_correctiva_id
   const solId = document.getElementById('modal-ot').dataset.solId;
   if (solId) {
     const equipoId = document.getElementById('ot-equipo').value;
@@ -868,8 +904,7 @@ async function confirmarRechazar() {
   } catch(e) { alert('Error: '+e.message); }
 }
 
-// ─── CORRECCIÓN HORÓMETRO ─────────────────────────────────────────
-
+// CORRECCIÓN HORÓMETRO
 function abrirCorreccion(equipoId, horActual) {
   document.getElementById('corr-equipo-id').value = equipoId;
   document.getElementById('corr-lectura').value = '';
@@ -892,8 +927,7 @@ async function confirmarCorreccion() {
   } catch(e) { alert('Error: '+e.message); }
 }
 
-// ─── UTILS ────────────────────────────────────────────────────────
-
+// UTILS
 function cerrarModal(id) { document.getElementById(id).classList.remove('open'); }
 
 window.onclick = function(e) {
@@ -902,7 +936,6 @@ window.onclick = function(e) {
   });
 };
 
-// Patch guardarOT para manejar solicitudes
 const _guardarOT = guardarOT;
 window.guardarOT = function() {
   if (document.getElementById('modal-ot').dataset.solId) {
@@ -914,7 +947,6 @@ window.guardarOT = function() {
 
 // Init
 cargarReporte();
-// Verificar solicitudes pendientes al cargar
 api('/planificador/solicitudes-correctivas?estado=pendiente').then(data => {
   if (data && data.length) {
     const btn = document.getElementById('btn-solicitudes');
