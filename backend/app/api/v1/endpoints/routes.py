@@ -368,9 +368,7 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
     result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
     equipo = result.fetchone()
     codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
-    equipo = result.fetchone()
-    codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
-    data = dict(payload)
+       data = dict(payload)
     if codigo:
         data["qr_code"] = generar_qr_base64(codigo)
     sets, params = [], {"id": equipo_id}
