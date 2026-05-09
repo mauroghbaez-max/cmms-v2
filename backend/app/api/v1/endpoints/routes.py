@@ -368,10 +368,17 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
     result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
     equipo = result.fetchone()
     codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
+    equipo = result.fetchone()
+    codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
+    data = dict(payload)
     if codigo:
-        payload["qr_code"] = generar_qr_base64(codigo)
-
+        data["qr_code"] = generar_qr_base64(codigo)
     sets, params = [], {"id": equipo_id}
+    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
+                  "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
+        if campo in data:
+            sets.append(f"{campo} = :{campo}")
+            params[campo] = data[campo]
     for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
                   "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
         if campo in payload:
