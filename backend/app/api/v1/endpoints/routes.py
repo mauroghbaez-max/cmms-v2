@@ -344,7 +344,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
         raise HTTPException(400, "Código interno ya existe")
     import uuid
     eid = str(uuid.uuid4())
-     try:
+    try:
         qr_base64 = generar_qr_base64(payload["codigo_interno"])
         print(f"POST QR OK len={len(qr_base64)}", flush=True)
     except Exception as ex:
