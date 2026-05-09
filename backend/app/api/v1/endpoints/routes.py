@@ -350,6 +350,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     except Exception as ex:
         print(f"POST QR ERROR: {ex}", flush=True)
         qr_base64 = None
+    print(f"qr_base64 type: {type(qr_base64)}, is None: {qr_base64 is None}", flush=True)
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
