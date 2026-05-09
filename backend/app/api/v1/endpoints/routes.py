@@ -344,7 +344,12 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
         raise HTTPException(400, "Código interno ya existe")
     import uuid
     eid = str(uuid.uuid4())
-    qr_base64 = generar_qr_base64(payload["codigo_interno"])
+     try:
+        qr_base64 = generar_qr_base64(payload["codigo_interno"])
+        print(f"POST QR OK len={len(qr_base64)}", flush=True)
+    except Exception as ex:
+        print(f"POST QR ERROR: {ex}", flush=True)
+        qr_base64 = None
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
