@@ -380,24 +380,6 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
     if sets:
         await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
         await db.commit()
-    return {"ok": True}(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
-    if "codigo_interno" in payload:
-        payload["qr_code"] = generar_qr_base64(payload["codigo_interno"])
-    elif "qr_code" not in payload:
-        result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
-        equipo = result.fetchone()
-        if equipo:
-            payload["qr_code"] = generar_qr_base64(equipo.codigo_interno)
-
-    sets, params = [], {"id": equipo_id}
-    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
-                  "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
-        if campo in payload:
-            sets.append(f"{campo} = :{campo}")
-            params[campo] = payload[campo]
-    if sets:
-        await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
-        await db.commit()
     return {"ok": True}
 
 # ─── HOROMETRISTA ─────────────────────────────────────────────────────────────
