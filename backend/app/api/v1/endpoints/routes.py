@@ -363,7 +363,25 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     return {"ok": True, "id": eid}
 
 @router.put("/relevador/equipos/{equipo_id}")
+async def @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
+    # Siempre regenerar QR
+    result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
+    equipo = result.fetchone()
+    codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
+    if codigo:
+        payload["qr_code"] = generar_qr_base64(codigo)
+
+    sets, params = [], {"id": equipo_id}
+    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
+                  "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
+        if campo in payload:
+            sets.append(f"{campo} = :{campo}")
+            params[campo] = payload[campo]
+    if sets:
+        await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
+        await db.commit()
+    return {"ok": True}(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
     if "codigo_interno" in payload:
         payload["qr_code"] = generar_qr_base64(payload["codigo_interno"])
     elif "qr_code" not in payload:
