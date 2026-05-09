@@ -345,7 +345,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     import uuid
     eid = str(uuid.uuid4())
     try:
-        qr_base64 = generar_qr_base64(payload["codigo_interno"])
+       qr_base64 = "TEST_QR_SIMPLE"
         print(f"POST QR OK len={len(qr_base64)}", flush=True)
     except Exception as ex:
         print(f"POST QR ERROR: {ex}", flush=True)
