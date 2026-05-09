@@ -52,5 +52,3 @@ app.include_router(panol_routes.router, prefix="/api/v1")
 from app.api.v1.endpoints import operador_routes
 app.include_router(operador_routes.router, prefix="/api/v1")
 import os
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend")
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
