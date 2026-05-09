@@ -345,7 +345,7 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     import uuid
     eid = str(uuid.uuid4())
     try:
-        qr_base64 = "TEST_QR_SIMPLE"
+       qr_base64 = "TEST_QR_SIMPLE"
         print(f"POST QR OK len={len(qr_base64)}", flush=True)
     except Exception as ex:
         print(f"POST QR ERROR: {ex}", flush=True)
@@ -489,4 +489,9 @@ async def guardar_observacion(
     await db.execute(text(f"UPDATE equipos SET {campo} = :obs WHERE id = :id"),
                      {"obs": payload.get("observacion"), "id": equipo_id})
     await db.commit()
+    if qr_base64:
+        await db.execute(text("UPDATE equipos SET qr_code = :qr WHERE id = :id"),
+                        {"qr": qr_base64, "id": eid})
+        await db.commit()
+        print(f"QR UPDATE ejecutado para {eid}", flush=True)
     return {"ok": True}
