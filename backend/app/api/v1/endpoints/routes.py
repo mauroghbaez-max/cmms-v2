@@ -379,11 +379,6 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
         if campo in data:
             sets.append(f"{campo} = :{campo}")
             params[campo] = data[campo]
-    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
-                  "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
-        if campo in payload:
-            sets.append(f"{campo} = :{campo}")
-            params[campo] = payload[campo]
     if sets:
         await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
         await db.commit()
