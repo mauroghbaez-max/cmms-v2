@@ -778,7 +778,7 @@ async function verDetalleOT(otId) {
     if (o.estado === 'completada') {
       acciones.innerHTML = `<button class="btn btn-ok" onclick='imprimirCierreOT("${o.id}")'>🖨 Imprimir cierre OT</button>`;
     }
-    ACCIONES.INNERHTML += `<BUTTON CLASS="BTN" ONCLICK='CERRARMODAL("MODAL-DETALLE-OT")'>Cerrar</button>`;
+        acciones.innerHTML += `<button class="btn" onclick='cerrarModal("modal-detalle-ot")'>Cerrar</button>`;
   } catch(e) {
     document.getElementById('detalle-ot-body').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
   }
