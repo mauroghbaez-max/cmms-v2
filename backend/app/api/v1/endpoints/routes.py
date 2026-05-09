@@ -382,6 +382,7 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
         if campo in data:
             sets.append(f"{campo} = :{campo}")
             params[campo] = data[campo]
+    print(f"sets: {sets}", flush=True)
     if sets:
         await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
         await db.commit()
