@@ -66,6 +66,145 @@ async def logout(current_user: dict = Depends(get_current_user), db: AsyncSessio
     await db.commit()
     return {"ok": True}
 
+# ─── VISTA PÚBLICA QR (sin autenticación) ────────────────────────────────────
+
+@router.get("/publico/equipo/{codigo_interno}")
+async def vista_publica_equipo(
+    codigo_interno: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Vista pública mínima — accesible escaneando el QR sin login."""
+    result = await db.execute(text("""
+        SELECT nombre, codigo_interno, codigo_sap, marca, modelo, anio, ubicacion, sector
+        FROM equipos WHERE codigo_interno = :ci AND activo = true
+    """), {"ci": codigo_interno})
+    e = result.fetchone()
+    if not e:
+        raise HTTPException(404, "Equipo no encontrado")
+    return {
+        "nombre": e.nombre,
+        "codigo_interno": e.codigo_interno,
+        "codigo_sap": e.codigo_sap,
+        "marca": e.marca,
+        "modelo": e.modelo,
+        "anio": e.anio,
+        "ubicacion": e.ubicacion,
+        "sector": e.sector,
+    }
+
+# ─── VISTA AUTORIZADA QR (con autenticación) ─────────────────────────────────
+
+@router.get("/equipo/{codigo_interno}/detalle")
+async def vista_autorizada_equipo(
+    codigo_interno: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Vista completa del equipo para perfiles autorizados."""
+    result = await db.execute(text("""
+        SELECT e.*, u.nombre_completo AS relevador_nombre
+        FROM equipos e
+        LEFT JOIN usuarios u ON u.id = e.relevador_id
+        WHERE e.codigo_interno = :ci AND e.activo = true
+    """), {"ci": codigo_interno})
+    e = result.fetchone()
+    if not e:
+        raise HTTPException(404, "Equipo no encontrado")
+
+    # Último servicio
+    ultimo_r = await db.execute(text("""
+        SELECT o.numero, o.fecha_cierre, o.horometro_apertura, o.horometro_cierre,
+               o.mecanico_nombre, o.auxiliar_nombre, o.observaciones_cierre,
+               p.nombre AS plan_nombre, p.horas_hito
+        FROM ordenes_trabajo o
+        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        WHERE o.equipo_id = :eid AND o.estado = 'completada'
+        ORDER BY o.fecha_cierre DESC LIMIT 1
+    """), {"eid": str(e.id)})
+    ultimo = ultimo_r.fetchone()
+
+    # Próximo servicio
+    proximo_r = await db.execute(text("""
+        SELECT p.nombre, p.horas_hito, p.horas_alerta
+        FROM planes_mantenimiento p
+        WHERE p.equipo_id = :eid AND p.activo = true AND p.eliminado = false
+        ORDER BY p.horas_hito ASC LIMIT 1
+    """), {"eid": str(e.id)})
+    proximo = proximo_r.fetchone()
+
+    # OT activa actual
+    ot_activa_r = await db.execute(text("""
+        SELECT o.numero, o.estado, o.mecanico_nombre, o.fecha_apertura,
+               p.nombre AS plan_nombre
+        FROM ordenes_trabajo o
+        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        WHERE o.equipo_id = :eid AND o.estado NOT IN ('completada','cancelada')
+        ORDER BY o.fecha_apertura DESC LIMIT 1
+    """), {"eid": str(e.id)})
+    ot_activa = ot_activa_r.fetchone()
+
+    # Historial últimos 5 servicios
+    hist_r = await db.execute(text("""
+        SELECT o.numero, o.estado, o.horometro_apertura, o.horometro_cierre,
+               o.fecha_apertura, o.fecha_cierre, o.mecanico_nombre,
+               p.nombre AS plan_nombre
+        FROM ordenes_trabajo o
+        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        WHERE o.equipo_id = :eid AND o.estado = 'completada'
+        ORDER BY o.fecha_cierre DESC LIMIT 5
+    """), {"eid": str(e.id)})
+    historial = hist_r.fetchall()
+
+    return {
+        "nombre": e.nombre,
+        "codigo_interno": e.codigo_interno,
+        "codigo_sap": e.codigo_sap,
+        "marca": e.marca,
+        "modelo": e.modelo,
+        "anio": e.anio,
+        "ubicacion": e.ubicacion,
+        "sector": e.sector,
+        "horometro_actual": e.horometro_actual,
+        "relevador": e.relevador_nombre,
+        "obs_relevador": e.obs_relevador,
+        "obs_horometrista": e.obs_horometrista,
+        "obs_operador": e.obs_operador,
+        "obs_planificador": e.obs_planificador,
+        "ot_activa": {
+            "numero": ot_activa.numero,
+            "estado": ot_activa.estado,
+            "mecanico": ot_activa.mecanico_nombre,
+            "plan": ot_activa.plan_nombre,
+            "fecha_apertura": ot_activa.fecha_apertura.strftime("%d/%m/%Y %H:%M") if ot_activa.fecha_apertura else "—",
+        } if ot_activa else None,
+        "ultimo_servicio": {
+            "numero": ultimo.numero,
+            "plan": ultimo.plan_nombre,
+            "horas_hito": ultimo.horas_hito,
+            "horometro_apertura": ultimo.horometro_apertura,
+            "horometro_cierre": ultimo.horometro_cierre,
+            "mecanico": ultimo.mecanico_nombre,
+            "auxiliar": ultimo.auxiliar_nombre,
+            "fecha_cierre": ultimo.fecha_cierre.strftime("%d/%m/%Y %H:%M") if ultimo.fecha_cierre else "—",
+            "observaciones": ultimo.observaciones_cierre,
+        } if ultimo else None,
+        "proximo_servicio": {
+            "plan": proximo.nombre,
+            "horas_hito": proximo.horas_hito,
+            "horas_alerta": proximo.horas_alerta,
+            "hs_faltantes": round(proximo.horas_hito - (e.horometro_actual or 0), 1),
+        } if proximo else None,
+        "historial": [{
+            "numero": h.numero,
+            "plan": h.plan_nombre,
+            "horometro_apertura": h.horometro_apertura,
+            "horometro_cierre": h.horometro_cierre,
+            "mecanico": h.mecanico_nombre,
+            "fecha_apertura": h.fecha_apertura.strftime("%d/%m/%Y") if h.fecha_apertura else "—",
+            "fecha_cierre": h.fecha_cierre.strftime("%d/%m/%Y") if h.fecha_cierre else "—",
+        } for h in historial],
+    }
+
 # ─── ADMIN ────────────────────────────────────────────────────────────────────
 
 @router.get("/admin/empresa")
@@ -184,7 +323,7 @@ async def relevador_equipos(db: AsyncSession = Depends(get_db), current_user: di
     result = await db.execute(text("""
         SELECT id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                marca, modelo, anio, horometro_actual, activo, observaciones,
-               foto1_base64, qr_code
+               obs_relevador, foto1_base64, qr_code
         FROM equipos ORDER BY nombre
     """))
     rows = result.fetchall()
@@ -192,8 +331,8 @@ async def relevador_equipos(db: AsyncSession = Depends(get_db), current_user: di
              "codigo_sap": r.codigo_sap, "ubicacion": r.ubicacion, "sector": r.sector,
              "marca": r.marca, "modelo": r.modelo, "anio": r.anio,
              "horometro_actual": r.horometro_actual, "activo": r.activo,
-             "observaciones": r.observaciones, "foto1_base64": r.foto1_base64,
-             "qr_code": r.qr_code} for r in rows]
+             "observaciones": r.observaciones, "obs_relevador": r.obs_relevador,
+             "foto1_base64": r.foto1_base64, "qr_code": r.qr_code} for r in rows]
 
 @router.post("/relevador/equipos")
 async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
@@ -206,34 +345,33 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
-                             foto1_base64, qr_code, activo, observaciones, relevador_id)
+                             foto1_base64, qr_code, activo, observaciones, obs_relevador, relevador_id)
         VALUES (:id, :nombre, :ci, :cs, :ubi, :sector, :marca, :modelo, :anio,
-                :h0, :h0, :foto, :qr, :activo, :obs, :rid)
+                :h0, :h0, :foto, :qr, :activo, :obs, :obs_rel, :rid)
     """), {"id": eid, "nombre": payload["nombre"], "ci": payload["codigo_interno"],
            "cs": payload.get("codigo_sap"), "ubi": payload.get("ubicacion"),
            "sector": payload.get("sector"), "marca": payload.get("marca"),
            "modelo": payload.get("modelo"), "anio": payload.get("anio"),
            "h0": payload.get("horometro_inicial", 0), "foto": payload.get("foto1_base64"),
-           "qr": qr_base64,
-           "activo": payload.get("activo", True), "obs": payload.get("observaciones"),
+           "qr": qr_base64, "activo": payload.get("activo", True),
+           "obs": payload.get("observaciones"), "obs_rel": payload.get("obs_relevador"),
            "rid": current_user["id"]})
     await db.commit()
     return {"ok": True, "id": eid}
 
 @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
-    # Regenerar QR si se cambia el codigo_interno
     if "codigo_interno" in payload:
         payload["qr_code"] = generar_qr_base64(payload["codigo_interno"])
     elif "qr_code" not in payload:
-        # Siempre regenerar QR al editar usando el codigo_interno actual
         result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
         equipo = result.fetchone()
         if equipo:
             payload["qr_code"] = generar_qr_base64(equipo.codigo_interno)
 
     sets, params = [], {"id": equipo_id}
-    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio", "activo", "observaciones", "foto1_base64", "qr_code"]:
+    for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
+                  "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
         if campo in payload:
             sets.append(f"{campo} = :{campo}")
             params[campo] = payload[campo]
@@ -247,13 +385,14 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
 @router.get("/horometrista/equipos")
 async def horometrista_equipos(db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
     result = await db.execute(text("""
-        SELECT id, nombre, codigo_interno, ubicacion, sector, horometro_actual, activo
+        SELECT id, nombre, codigo_interno, ubicacion, sector, horometro_actual, activo, obs_horometrista
         FROM equipos WHERE activo = true ORDER BY nombre
     """))
     rows = result.fetchall()
     return [{"id": str(r.id), "nombre": r.nombre, "codigo_interno": r.codigo_interno,
              "ubicacion": r.ubicacion, "sector": r.sector,
-             "horometro_actual": r.horometro_actual} for r in rows]
+             "horometro_actual": r.horometro_actual,
+             "obs_horometrista": r.obs_horometrista} for r in rows]
 
 @router.post("/horometrista/horometros")
 async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
@@ -270,6 +409,10 @@ async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), cu
            "obs": payload.get("observaciones")})
     await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
                      {"lec": payload["lectura"], "id": payload["equipo_id"]})
+    # Guardar observación del horometrista si viene
+    if payload.get("obs_horometrista") is not None:
+        await db.execute(text("UPDATE equipos SET obs_horometrista = :obs WHERE id = :id"),
+                         {"obs": payload.get("obs_horometrista"), "id": payload["equipo_id"]})
     await db.commit()
     return {"ok": True}
 
@@ -305,5 +448,31 @@ async def corregir_horometro(equipo_id: str, payload: dict, db: AsyncSession = D
            "obs": payload.get("observaciones")})
     await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
                      {"lec": payload["lectura"], "id": equipo_id})
+    await db.commit()
+    return {"ok": True}
+
+# ─── OBSERVACIONES POR ROL ────────────────────────────────────────────────────
+
+@router.put("/equipo/{equipo_id}/observacion")
+async def guardar_observacion(
+    equipo_id: str,
+    payload: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """Guarda la observación del rol actual sobre el equipo."""
+    rol = current_user["rol"]
+    campo_map = {
+        "relevador": "obs_relevador",
+        "horometrista": "obs_horometrista",
+        "operario": "obs_operador",
+        "planificador": "obs_planificador",
+        "admin": "obs_planificador",
+    }
+    campo = campo_map.get(rol)
+    if not campo:
+        raise HTTPException(403, "Sin permiso para agregar observaciones")
+    await db.execute(text(f"UPDATE equipos SET {campo} = :obs WHERE id = :id"),
+                     {"obs": payload.get("observacion"), "id": equipo_id})
     await db.commit()
     return {"ok": True}
