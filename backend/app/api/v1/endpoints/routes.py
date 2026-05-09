@@ -10,9 +10,12 @@ import json, qrcode, io, base64
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
-def generar_qr_base64(texto: str) -> str:
+FRONTEND_URL = "https://bucolic-frangipane-798714.netlify.app"
+
+def generar_qr_base64(codigo_interno: str) -> str:
+    url = f"{FRONTEND_URL}/equipo.html?codigo={codigo_interno}"
     qr = qrcode.QRCode(version=1, box_size=10, border=4)
-    qr.add_data(texto)
+    qr.add_data(url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     buffer = io.BytesIO()
