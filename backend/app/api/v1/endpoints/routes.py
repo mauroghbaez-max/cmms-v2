@@ -363,7 +363,6 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     return {"ok": True, "id": eid}
 
 @router.put("/relevador/equipos/{equipo_id}")
-async def @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
     # Siempre regenerar QR
     result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
