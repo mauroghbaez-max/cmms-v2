@@ -130,13 +130,18 @@ async def planificador_equipos(
     current_user: dict = Depends(require_rol("planificador"))
 ):
     result = await db.execute(text("""
-        SELECT id, nombre, codigo_interno, horometro_actual, activo
-        FROM equipos WHERE activo = true ORDER BY nombre
+        SELECT id, nombre, codigo_interno, codigo_sap, marca, modelo,
+               ubicacion, sector, horometro_actual, activo
+        FROM equipos ORDER BY nombre
     """))
     rows = result.fetchall()
     return [{"id": str(r.id), "nombre": r.nombre,
              "codigo_interno": r.codigo_interno,
-             "horometro_actual": r.horometro_actual} for r in rows]
+             "codigo_sap": r.codigo_sap,
+             "marca": r.marca, "modelo": r.modelo,
+             "ubicacion": r.ubicacion, "sector": r.sector,
+             "horometro_actual": r.horometro_actual,
+             "activo": r.activo} for r in rows]
 
 
 @router.get("/planificador/planes/{equipo_id}")
