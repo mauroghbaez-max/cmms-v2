@@ -370,7 +370,12 @@ async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSessio
     codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
     data = dict(payload)
     if codigo:
-        data["qr_code"] = generar_qr_base64(codigo)
+        try:
+            data["qr_code"] = generar_qr_base64(codigo)
+            print(f"QR OK para {codigo}, len={len(data['qr_code'])}", flush=True)
+        except Exception as ex:
+            print(f"QR ERROR: {ex}", flush=True)
+    print(f"data keys: {list(data.keys())}", flush=True)
     sets, params = [], {"id": equipo_id}
     for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
                   "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
