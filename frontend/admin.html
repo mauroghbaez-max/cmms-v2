@@ -201,6 +201,8 @@ input:checked+.slider:before{transform:translateX(16px);background:#fff;}
           <option value="horometrista">Horometrista</option>
           <option value="relevador">Relevador</option>
           <option value="operario">Operario</option>
+          <option value="inspector">Inspector</option>
+          <option value="gerencia">Gerencia</option>
         </select>
       </div>
       <div class="fg"><label>Email notificaciones</label><input type="text" id="u-email-noti" placeholder="juan@empresa.com"></div>
@@ -310,7 +312,7 @@ async function guardarEmpresa() {
 
 async function cargarUsuarios() {
   var data = await api('/admin/usuarios') || [];
-  var roles = {admin:'Admin',planificador:'Planificador',rrhh:'RRHH',panol:'Pañol',horometrista:'Horometrista',relevador:'Relevador',operario:'Operario'};
+  var roles = {admin:'Admin',planificador:'Planificador',rrhh:'RRHH',panol:'Pañol',horometrista:'Horometrista',relevador:'Relevador',operario:'Operario',inspector:'Inspector',gerencia:'Gerencia'};
   var tbody = document.getElementById('tbody-usuarios');
   if (!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Sin usuarios</td></tr>'; return; }
   tbody.innerHTML = data.map(function(u) {
