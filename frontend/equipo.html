@@ -101,7 +101,7 @@ main{padding:20px;max-width:800px;margin:0 auto;}
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 const API = 'https://cmms-v2-production.up.railway.app/api/v1';
 const params = new URLSearchParams(window.location.search);
@@ -347,9 +347,8 @@ function salir() {
   cargar();
 }
 
-// ── QR Scanner ──────────────────────────────────────────────────────────────
-let scanStream = null;
-let scanRAF = null;
+// ── QR Scanner (html5-qrcode) ────────────────────────────────────────────────
+let html5QrScanner = null;
 
 function iniciarScanner() {
   const area = document.getElementById('qr-scanner-area');
@@ -357,10 +356,9 @@ function iniciarScanner() {
   document.getElementById('btn-iniciar-scan').style.display = 'none';
 
   area.innerHTML = `
-    <div class="qr-wrap" id="qr-wrap">
-      <video id="qr-video" playsinline autoplay muted></video>
-      <canvas id="qr-canvas" style="display:none;"></canvas>
-      <div class="qr-overlay">
+    <div class="qr-wrap" style="position:relative;max-width:340px;margin:20px auto 0;">
+      <div id="qr-reader"></div>
+      <div class="qr-overlay" style="pointer-events:none;position:absolute;inset:0;">
         <div class="qr-corner tl"></div><div class="qr-corner tr"></div>
         <div class="qr-corner bl"></div><div class="qr-corner br"></div>
         <div class="qr-line"></div>
@@ -370,65 +368,38 @@ function iniciarScanner() {
     <div><button class="btn-cancelar-scan" onclick="detenerScanner()">Cancelar</button></div>
   `;
 
-  navigator.mediaDevices.getUserMedia({
-    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
-  })
-    .then(stream => {
-      scanStream = stream;
-      const video = document.getElementById('qr-video');
-      video.srcObject = stream;
-      // 'playing' garantiza que ya hay frames reales disponibles
-      video.addEventListener('playing', () => { scanRAF = requestAnimationFrame(scanFrame); });
-      video.play().catch(() => {});
-    })
-    .catch(err => {
-      area.innerHTML = `<div class="qr-status" style="color:var(--danger);margin-top:16px;">
-        No se pudo acceder a la cámara.<br><small>${err.message}</small>
-      </div>`;
-      document.getElementById('btn-iniciar-scan').style.display = '';
-    });
-}
+  html5QrScanner = new Html5Qrcode('qr-reader');
 
-function scanFrame() {
-  const video = document.getElementById('qr-video');
-  const canvas = document.getElementById('qr-canvas');
-  // Si el elemento ya no existe (cancelado), salir
-  if (!video || !canvas) return;
-
-  // Esperar a que el video tenga dimensiones reales
-  if (video.videoWidth === 0 || video.videoHeight === 0) {
-    scanRAF = requestAnimationFrame(scanFrame); return;
-  }
-
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-  // attemptBoth maneja QR claros e invertidos
-  const qr = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
-
-  if (qr && qr.data) {
-    detenerScanner();
-    let codigoDetectado = qr.data.trim();
-    try {
-      const url = new URL(qr.data);
-      const c = url.searchParams.get('codigo');
-      if (c) codigoDetectado = c;
-    } catch(e) { /* valor crudo */ }
-    // DEBUG TEMPORAL — borrar después de confirmar
-    alert('QR leído: "' + qr.data + '"\nCódigo extraído: "' + codigoDetectado + '"');
-    window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
-    return;
-  }
-
-  scanRAF = requestAnimationFrame(scanFrame);
+  html5QrScanner.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: { width: 240, height: 240 } },
+    (decodedText) => {
+      // QR detectado
+      detenerScanner();
+      let codigoDetectado = decodedText.trim();
+      try {
+        const url = new URL(decodedText);
+        const c = url.searchParams.get('codigo');
+        if (c) codigoDetectado = c;
+      } catch(e) { /* valor crudo */ }
+      // DEBUG TEMPORAL — borrar después de confirmar
+      alert('QR leído: "' + decodedText + '"\nCódigo extraído: "' + codigoDetectado + '"');
+      window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
+    },
+    () => { /* frame sin QR, ignorar */ }
+  ).catch(err => {
+    area.innerHTML = `<div class="qr-status" style="color:var(--danger);margin-top:16px;">
+      No se pudo acceder a la cámara.<br><small>${err}</small>
+    </div>`;
+    document.getElementById('btn-iniciar-scan').style.display = '';
+  });
 }
 
 function detenerScanner() {
-  if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
-  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  if (html5QrScanner) {
+    html5QrScanner.stop().catch(() => {});
+    html5QrScanner = null;
+  }
   const area = document.getElementById('qr-scanner-area');
   if (area) area.innerHTML = '';
   const btn = document.getElementById('btn-iniciar-scan');
