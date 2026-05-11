@@ -88,7 +88,14 @@ main{padding:20px;max-width:800px;margin:0 auto;}
 <script>
 const API = 'https://cmms-v2-production.up.railway.app/api/v1';
 const params = new URLSearchParams(window.location.search);
-const codigo = params.get('codigo') || window.location.pathname.split('/').pop();
+
+// ✅ FIX: solo leer ?codigo= de la URL.
+// Antes: `|| window.location.pathname.split('/').pop()` devolvía
+// "equipo.html" cuando no había parámetro → el if(!codigo) nunca se
+// ejecutaba → se pedía /api/v1/equipo/equipo.html/detalle → 404 +
+// renderizado con undefined.
+const codigo = params.get('codigo');
+
 let token = localStorage.getItem('manten_token');
 let user = JSON.parse(localStorage.getItem('manten_user') || 'null');
 
@@ -104,14 +111,19 @@ function actualizarNav() {
 
 async function cargar() {
   if (!codigo) {
+    // Sin código QR en la URL → decidir por rol
     const esInspector = user && (user.rol === 'inspector' || user.rol === 'gerencia');
     document.getElementById('main').innerHTML = esInspector
-      ? `<div style="text-align:center;padding:40px 20px;">
-          <div style="font-size:40px;margin-bottom:16px;">📷</div>
-          <div style="font-size:18px;font-weight:700;color:var(--cel2);margin-bottom:8px;">Bienvenido, ${user ? user.nombre_completo : ''}</div>
-          <div style="font-size:14px;color:var(--txt2);">Escaneá el QR del equipo para ver su información.</div>
+      ? `<div style="text-align:center;padding:60px 20px;">
+          <div style="font-size:56px;margin-bottom:20px;">📷</div>
+          <div style="font-size:20px;font-weight:700;color:var(--cel2);margin-bottom:10px;">
+            Bienvenido, ${user.nombre_completo}
+          </div>
+          <div style="font-size:14px;color:var(--txt2);max-width:280px;margin:0 auto;line-height:1.6;">
+            Escaneá el código QR pegado en el equipo para ver su ficha completa.
+          </div>
         </div>`
-      : '<div class="empty">Código de equipo no especificado</div>';
+      : '<div class="empty">Código de equipo no especificado.</div>';
     return;
   }
 
@@ -121,7 +133,14 @@ async function cargar() {
       const r = await fetch(API + '/equipo/' + encodeURIComponent(codigo) + '/detalle', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
-      if (r.status === 401) { token = null; user = null; localStorage.clear(); cargar(); return; }
+      if (r.status === 401) {
+        token = null; user = null; localStorage.clear(); cargar(); return;
+      }
+      // ✅ FIX secundario: verificar que la respuesta sea OK antes de renderizar
+      if (!r.ok) {
+        document.getElementById('main').innerHTML = '<div class="empty">Equipo no encontrado.</div>';
+        return;
+      }
       const data = await r.json();
       renderAutorizado(data);
     } catch(e) {
@@ -306,7 +325,6 @@ function salir() {
 }
 
 actualizarNav();
-// Pequeño delay para asegurar que user esté cargado
 setTimeout(cargar, 50);
 </script>
 </body>
