@@ -5,20 +5,12 @@ from app.db.session import engine, Base
 from app.db.models import *
 from app.core.security import hash_password
 from sqlalchemy import text
+from contextlib import asynccontextmanager
 import os
 
-app = FastAPI(title="MANTEN. v2.0", version="2.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*", "https://bucolic-frangipane-798714.netlify.app"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── Startup ──────────────────────────────────────────────────────────
     print("Iniciando MANTEN. v2.0...", flush=True)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -36,6 +28,19 @@ async def startup():
                 print("Admin creado — user: admin / pass: admin1234", flush=True)
         except Exception as e:
             print(f"Error startup: {e}", flush=True)
+    yield
+    # ── Shutdown (si se necesita algo en el futuro) ───────────────────────
+
+app = FastAPI(title="MANTEN. v2.0", version="2.0.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*", "https://bucolic-frangipane-798714.netlify.app"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.get("/health")
 async def health():

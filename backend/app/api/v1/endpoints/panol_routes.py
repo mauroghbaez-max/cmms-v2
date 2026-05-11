@@ -72,20 +72,26 @@ async def panol_pedidos_preventivos(
     Pedidos preventivos: materiales del próximo servicio
     generados al cerrar una OT por el operador.
     """
+    # FIX: DISTINCT ON evita duplicados cuando hay múltiples OTs completadas
+    # para el mismo equipo. Se queda con la más reciente por equipo.
     result = await db.execute(text("""
         SELECT
             o.id, o.numero, o.fecha_cierre,
             e.nombre AS equipo_nombre, e.codigo_interno,
             p_sig.nombre AS proximo_plan, p_sig.horas_hito AS proximas_horas,
             pm.codigo_sap, pm.descripcion, pm.cantidad, pm.unidad
-        FROM ordenes_trabajo o
+        FROM (
+            SELECT DISTINCT ON (equipo_id) *
+            FROM ordenes_trabajo
+            WHERE estado = 'completada'
+              AND fecha_cierre >= NOW() - INTERVAL '7 days'
+            ORDER BY equipo_id, fecha_cierre DESC
+        ) o
         JOIN equipos e ON e.id = o.equipo_id
         JOIN planes_mantenimiento p_sig ON p_sig.equipo_id = e.id
             AND p_sig.horas_hito > COALESCE(o.horometro_cierre, 0)
             AND p_sig.eliminado = false
         JOIN plan_materiales pm ON pm.plan_id = p_sig.id
-        WHERE o.estado = 'completada'
-          AND o.fecha_cierre >= NOW() - INTERVAL '7 days'
         ORDER BY o.fecha_cierre DESC, e.nombre, p_sig.horas_hito
     """))
     rows = result.fetchall()
