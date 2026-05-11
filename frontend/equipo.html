@@ -370,13 +370,16 @@ function iniciarScanner() {
     <div><button class="btn-cancelar-scan" onclick="detenerScanner()">Cancelar</button></div>
   `;
 
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+  })
     .then(stream => {
       scanStream = stream;
       const video = document.getElementById('qr-video');
       video.srcObject = stream;
-      video.play();
-      video.addEventListener('loadedmetadata', () => scanFrame());
+      // 'playing' garantiza que ya hay frames reales disponibles
+      video.addEventListener('playing', () => { scanRAF = requestAnimationFrame(scanFrame); });
+      video.play().catch(() => {});
     })
     .catch(err => {
       area.innerHTML = `<div class="qr-status" style="color:var(--danger);margin-top:16px;">
@@ -389,27 +392,35 @@ function iniciarScanner() {
 function scanFrame() {
   const video = document.getElementById('qr-video');
   const canvas = document.getElementById('qr-canvas');
-  if (!video || !canvas || video.readyState < 2) {
+  // Si el elemento ya no existe (cancelado), salir
+  if (!video || !canvas) return;
+
+  // Esperar a que el video tenga dimensiones reales
+  if (video.videoWidth === 0 || video.videoHeight === 0) {
     scanRAF = requestAnimationFrame(scanFrame); return;
   }
-  canvas.width = video.videoWidth;
+
+  canvas.width  = video.videoWidth;
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const qr = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
-  if (qr) {
+
+  // attemptBoth maneja QR claros e invertidos
+  const qr = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+
+  if (qr && qr.data) {
     detenerScanner();
-    // Extraer código: puede ser URL completa o valor crudo
-    let codigoDetectado = qr.data;
+    let codigoDetectado = qr.data.trim();
     try {
       const url = new URL(qr.data);
       const c = url.searchParams.get('codigo');
       if (c) codigoDetectado = c;
-    } catch(e) { /* no es URL, usar valor crudo */ }
+    } catch(e) { /* valor crudo */ }
     window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
     return;
   }
+
   scanRAF = requestAnimationFrame(scanFrame);
 }
 
