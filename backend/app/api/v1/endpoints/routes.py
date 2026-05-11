@@ -14,7 +14,7 @@ FRONTEND_URL = "https://bucolic-frangipane-798714.netlify.app"
 
 def generar_qr_base64(codigo_interno: str) -> str:
     url = f"{FRONTEND_URL}/equipo.html?codigo={codigo_interno}"
-    qr = qrcode.QRCode(version=1, box_size=2, border=2)
+    qr = qrcode.QRCode(version=1, box_size=4, border=2)
     qr.add_data(url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
