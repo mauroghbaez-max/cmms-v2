@@ -5,7 +5,7 @@ from sqlalchemy import text
 from app.db.session import get_db
 from app.core.security import verify_password, create_access_token, decode_token
 from app.db.models import Usuario
-import json, qrcode, io, base64
+import json, qrcode, io, base64, uuid
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -26,7 +26,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     payload = decode_token(token)
     if not payload:
         raise HTTPException(status_code=401, detail="Token invalido o expirado")
-    result = await db.execute(text("SELECT id, username, nombre_completo, rol, activo, puede_ver_trazabilidad, email_notificaciones FROM usuarios WHERE id = :id"), {"id": payload.get("sub")})
+    result = await db.execute(text("SELECT id, username, nombre_completo, rol, activo, puede_ver_trazabilidad FROM usuarios WHERE id = :id"), {"id": payload.get("sub")})
     user = result.fetchone()
     if not user or not user.activo:
         raise HTTPException(status_code=401, detail="Usuario inactivo o no encontrado")
@@ -69,14 +69,10 @@ async def logout(current_user: dict = Depends(get_current_user), db: AsyncSessio
     await db.commit()
     return {"ok": True}
 
-# ─── VISTA PÚBLICA QR (sin autenticación) ────────────────────────────────────
+# ─── VISTA PÚBLICA QR ─────────────────────────────────────────────────────────
 
 @router.get("/publico/equipo/{codigo_interno}")
-async def vista_publica_equipo(
-    codigo_interno: str,
-    db: AsyncSession = Depends(get_db)
-):
-    """Vista pública mínima — accesible escaneando el QR sin login."""
+async def vista_publica_equipo(codigo_interno: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(text("""
         SELECT nombre, codigo_interno, codigo_sap, marca, modelo, anio, ubicacion, sector
         FROM equipos WHERE codigo_interno = :ci AND activo = true
@@ -84,128 +80,82 @@ async def vista_publica_equipo(
     e = result.fetchone()
     if not e:
         raise HTTPException(404, "Equipo no encontrado")
-    return {
-        "nombre": e.nombre,
-        "codigo_interno": e.codigo_interno,
-        "codigo_sap": e.codigo_sap,
-        "marca": e.marca,
-        "modelo": e.modelo,
-        "anio": e.anio,
-        "ubicacion": e.ubicacion,
-        "sector": e.sector,
-    }
+    return {"nombre": e.nombre, "codigo_interno": e.codigo_interno, "codigo_sap": e.codigo_sap,
+            "marca": e.marca, "modelo": e.modelo, "anio": e.anio,
+            "ubicacion": e.ubicacion, "sector": e.sector}
 
-# ─── VISTA AUTORIZADA QR (con autenticación) ─────────────────────────────────
+# ─── VISTA AUTORIZADA QR ──────────────────────────────────────────────────────
 
 @router.get("/equipo/{codigo_interno}/detalle")
-async def vista_autorizada_equipo(
-    codigo_interno: str,
-    db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """Vista completa del equipo para perfiles autorizados."""
+async def vista_autorizada_equipo(codigo_interno: str, db: AsyncSession = Depends(get_db), current_user: dict = Depends(get_current_user)):
     result = await db.execute(text("""
         SELECT e.*, u.nombre_completo AS relevador_nombre
-        FROM equipos e
-        LEFT JOIN usuarios u ON u.id = e.relevador_id
+        FROM equipos e LEFT JOIN usuarios u ON u.id = e.relevador_id
         WHERE e.codigo_interno = :ci AND e.activo = true
     """), {"ci": codigo_interno})
     e = result.fetchone()
     if not e:
         raise HTTPException(404, "Equipo no encontrado")
 
-    # Último servicio
     ultimo_r = await db.execute(text("""
         SELECT o.numero, o.fecha_cierre, o.horometro_apertura, o.horometro_cierre,
                o.mecanico_nombre, o.auxiliar_nombre, o.observaciones_cierre,
                p.nombre AS plan_nombre, p.horas_hito
-        FROM ordenes_trabajo o
-        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        FROM ordenes_trabajo o LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
         WHERE o.equipo_id = :eid AND o.estado = 'completada'
         ORDER BY o.fecha_cierre DESC LIMIT 1
     """), {"eid": str(e.id)})
     ultimo = ultimo_r.fetchone()
 
-    # Próximo servicio
     proximo_r = await db.execute(text("""
-        SELECT p.nombre, p.horas_hito, p.horas_alerta
-        FROM planes_mantenimiento p
+        SELECT p.nombre, p.horas_hito, p.horas_alerta FROM planes_mantenimiento p
         WHERE p.equipo_id = :eid AND p.activo = true AND p.eliminado = false
         ORDER BY p.horas_hito ASC LIMIT 1
     """), {"eid": str(e.id)})
     proximo = proximo_r.fetchone()
 
-    # OT activa actual
     ot_activa_r = await db.execute(text("""
-        SELECT o.numero, o.estado, o.mecanico_nombre, o.fecha_apertura,
-               p.nombre AS plan_nombre
-        FROM ordenes_trabajo o
-        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        SELECT o.numero, o.estado, o.mecanico_nombre, o.fecha_apertura, p.nombre AS plan_nombre
+        FROM ordenes_trabajo o LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
         WHERE o.equipo_id = :eid AND o.estado NOT IN ('completada','cancelada')
         ORDER BY o.fecha_apertura DESC LIMIT 1
     """), {"eid": str(e.id)})
     ot_activa = ot_activa_r.fetchone()
 
-    # Historial últimos 5 servicios
     hist_r = await db.execute(text("""
-        SELECT o.numero, o.estado, o.horometro_apertura, o.horometro_cierre,
-               o.fecha_apertura, o.fecha_cierre, o.mecanico_nombre,
-               p.nombre AS plan_nombre
-        FROM ordenes_trabajo o
-        LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
+        SELECT o.numero, o.horometro_apertura, o.horometro_cierre,
+               o.fecha_apertura, o.fecha_cierre, o.mecanico_nombre, p.nombre AS plan_nombre
+        FROM ordenes_trabajo o LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
         WHERE o.equipo_id = :eid AND o.estado = 'completada'
         ORDER BY o.fecha_cierre DESC LIMIT 5
     """), {"eid": str(e.id)})
     historial = hist_r.fetchall()
 
     return {
-        "nombre": e.nombre,
-        "codigo_interno": e.codigo_interno,
-        "codigo_sap": e.codigo_sap,
-        "marca": e.marca,
-        "modelo": e.modelo,
-        "anio": e.anio,
-        "ubicacion": e.ubicacion,
-        "sector": e.sector,
-        "horometro_actual": e.horometro_actual,
+        "nombre": e.nombre, "codigo_interno": e.codigo_interno, "codigo_sap": e.codigo_sap,
+        "marca": e.marca, "modelo": e.modelo, "anio": e.anio,
+        "ubicacion": e.ubicacion, "sector": e.sector, "horometro_actual": e.horometro_actual,
         "relevador": e.relevador_nombre,
-        "obs_relevador": e.obs_relevador,
-        "obs_horometrista": e.obs_horometrista,
-        "obs_operador": e.obs_operador,
-        "obs_planificador": e.obs_planificador,
-        "ot_activa": {
-            "numero": ot_activa.numero,
-            "estado": ot_activa.estado,
-            "mecanico": ot_activa.mecanico_nombre,
-            "plan": ot_activa.plan_nombre,
-            "fecha_apertura": ot_activa.fecha_apertura.strftime("%d/%m/%Y %H:%M") if ot_activa.fecha_apertura else "—",
-        } if ot_activa else None,
-        "ultimo_servicio": {
-            "numero": ultimo.numero,
-            "plan": ultimo.plan_nombre,
-            "horas_hito": ultimo.horas_hito,
-            "horometro_apertura": ultimo.horometro_apertura,
-            "horometro_cierre": ultimo.horometro_cierre,
-            "mecanico": ultimo.mecanico_nombre,
-            "auxiliar": ultimo.auxiliar_nombre,
-            "fecha_cierre": ultimo.fecha_cierre.strftime("%d/%m/%Y %H:%M") if ultimo.fecha_cierre else "—",
-            "observaciones": ultimo.observaciones_cierre,
-        } if ultimo else None,
-        "proximo_servicio": {
-            "plan": proximo.nombre,
-            "horas_hito": proximo.horas_hito,
-            "horas_alerta": proximo.horas_alerta,
-            "hs_faltantes": round(proximo.horas_hito - (e.horometro_actual or 0), 1),
-        } if proximo else None,
-        "historial": [{
-            "numero": h.numero,
-            "plan": h.plan_nombre,
-            "horometro_apertura": h.horometro_apertura,
-            "horometro_cierre": h.horometro_cierre,
-            "mecanico": h.mecanico_nombre,
-            "fecha_apertura": h.fecha_apertura.strftime("%d/%m/%Y") if h.fecha_apertura else "—",
-            "fecha_cierre": h.fecha_cierre.strftime("%d/%m/%Y") if h.fecha_cierre else "—",
-        } for h in historial],
+        "obs_relevador": e.obs_relevador, "obs_horometrista": e.obs_horometrista,
+        "obs_operador": e.obs_operador, "obs_planificador": e.obs_planificador,
+        "ot_activa": {"numero": ot_activa.numero, "estado": ot_activa.estado,
+                      "mecanico": ot_activa.mecanico_nombre, "plan": ot_activa.plan_nombre,
+                      "fecha_apertura": ot_activa.fecha_apertura.strftime("%d/%m/%Y %H:%M") if ot_activa.fecha_apertura else "—"} if ot_activa else None,
+        "ultimo_servicio": {"numero": ultimo.numero, "plan": ultimo.plan_nombre,
+                            "horas_hito": ultimo.horas_hito,
+                            "horometro_apertura": ultimo.horometro_apertura,
+                            "horometro_cierre": ultimo.horometro_cierre,
+                            "mecanico": ultimo.mecanico_nombre, "auxiliar": ultimo.auxiliar_nombre,
+                            "fecha_cierre": ultimo.fecha_cierre.strftime("%d/%m/%Y %H:%M") if ultimo.fecha_cierre else "—",
+                            "observaciones": ultimo.observaciones_cierre} if ultimo else None,
+        "proximo_servicio": {"plan": proximo.nombre, "horas_hito": proximo.horas_hito,
+                             "horas_alerta": proximo.horas_alerta,
+                             "hs_faltantes": round(proximo.horas_hito - (e.horometro_actual or 0), 1)} if proximo else None,
+        "historial": [{"numero": h.numero, "plan": h.plan_nombre,
+                       "horometro_apertura": h.horometro_apertura, "horometro_cierre": h.horometro_cierre,
+                       "mecanico": h.mecanico_nombre,
+                       "fecha_apertura": h.fecha_apertura.strftime("%d/%m/%Y") if h.fecha_apertura else "—",
+                       "fecha_cierre": h.fecha_cierre.strftime("%d/%m/%Y") if h.fecha_cierre else "—"} for h in historial],
     }
 
 # ─── ADMIN ────────────────────────────────────────────────────────────────────
@@ -261,8 +211,7 @@ async def crear_usuario(payload: dict, db: AsyncSession = Depends(get_db), curre
 async def editar_usuario(user_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("admin"))):
     from app.core.security import hash_password
     sets, params = [], {"id": user_id}
-    campos = ["nombre_completo", "rol", "area", "activo", "puede_ver_trazabilidad", "email_notificaciones", "observaciones"]
-    for campo in campos:
+    for campo in ["nombre_completo", "rol", "area", "activo", "puede_ver_trazabilidad", "email_notificaciones", "observaciones"]:
         if campo in payload:
             sets.append(f"{campo} = :{campo}")
             params[campo] = payload[campo]
@@ -276,10 +225,7 @@ async def editar_usuario(user_id: str, payload: dict, db: AsyncSession = Depends
 
 @router.get("/admin/log-accesos")
 async def log_accesos(db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("admin"))):
-    result = await db.execute(text("""
-        SELECT usuario_nombre, accion, modulo, ip, created_at
-        FROM log_accesos ORDER BY created_at DESC LIMIT 200
-    """))
+    result = await db.execute(text("SELECT usuario_nombre, accion, modulo, ip, created_at FROM log_accesos ORDER BY created_at DESC LIMIT 200"))
     rows = result.fetchall()
     return [{"usuario": r.usuario_nombre, "accion": r.accion, "modulo": r.modulo, "ip": r.ip, "fecha": r.created_at.isoformat() if r.created_at else None} for r in rows]
 
@@ -289,33 +235,26 @@ async def trazabilidad(equipo_id: str = None, fecha_desde: str = None, fecha_has
         raise HTTPException(403, "Sin permiso para ver trazabilidad")
     where, params = ["1=1"], {}
     if equipo_id:
-        where.append("o.equipo_id = :eid")
-        params["eid"] = equipo_id
+        where.append("o.equipo_id = :eid"); params["eid"] = equipo_id
     if fecha_desde:
         from datetime import date
-        where.append("o.fecha_apertura >= :fd")
-        params["fd"] = date.fromisoformat(fecha_desde)
+        where.append("o.fecha_apertura >= :fd"); params["fd"] = date.fromisoformat(fecha_desde)
     if fecha_hasta:
         from datetime import date, timedelta
-        where.append("o.fecha_apertura <= :fh")
-        params["fh"] = date.fromisoformat(fecha_hasta) + timedelta(days=1)
-    sql = f"""
+        where.append("o.fecha_apertura <= :fh"); params["fh"] = date.fromisoformat(fecha_hasta) + timedelta(days=1)
+    result = await db.execute(text(f"""
         SELECT o.numero, o.estado, o.descripcion, o.vehiculo_traslado,
                o.horometro_apertura, o.horometro_cierre,
                o.fecha_apertura, o.fecha_liberacion, o.fecha_aprobacion_rrhh, o.fecha_cierre,
-               o.mecanico_nombre, o.auxiliar_nombre,
-               o.rrhh_aprobado, o.panol_aprobado, o.observaciones,
+               o.mecanico_nombre, o.auxiliar_nombre, o.rrhh_aprobado, o.panol_aprobado, o.observaciones,
                e.nombre as equipo_nombre, e.codigo_interno as equipo_codigo, e.ubicacion,
-               p.nombre as plan_nombre, p.horas_hito,
-               u.nombre_completo as planificador_nombre
+               p.nombre as plan_nombre, p.horas_hito, u.nombre_completo as planificador_nombre
         FROM ordenes_trabajo o
         LEFT JOIN equipos e ON e.id = o.equipo_id
         LEFT JOIN planes_mantenimiento p ON p.id = o.plan_id
         LEFT JOIN usuarios u ON u.id = o.planificador_id
-        WHERE {' AND '.join(where)}
-        ORDER BY o.fecha_apertura DESC LIMIT 500
-    """
-    result = await db.execute(text(sql), params)
+        WHERE {' AND '.join(where)} ORDER BY o.fecha_apertura DESC LIMIT 500
+    """), params)
     rows = result.fetchall()
     return [{"numero": r.numero, "estado": r.estado, "descripcion": r.descripcion, "vehiculo": r.vehiculo_traslado, "equipo_nombre": r.equipo_nombre, "equipo_codigo": r.equipo_codigo, "ubicacion": r.ubicacion, "plan_nombre": r.plan_nombre, "horas_hito": r.horas_hito, "horometro_apertura": r.horometro_apertura, "horometro_cierre": r.horometro_cierre, "fecha_apertura": r.fecha_apertura.strftime("%d/%m/%Y %H:%M") if r.fecha_apertura else "-", "fecha_liberacion": r.fecha_liberacion.strftime("%d/%m/%Y %H:%M") if r.fecha_liberacion else "-", "fecha_rrhh": r.fecha_aprobacion_rrhh.strftime("%d/%m/%Y %H:%M") if r.fecha_aprobacion_rrhh else "-", "fecha_cierre": r.fecha_cierre.strftime("%d/%m/%Y %H:%M") if r.fecha_cierre else "-", "planificador": r.planificador_nombre, "mecanico": r.mecanico_nombre, "auxiliar": r.auxiliar_nombre, "rrhh_aprobado": r.rrhh_aprobado, "panol_aprobado": r.panol_aprobado, "observaciones": r.observaciones} for r in rows]
 
@@ -342,15 +281,8 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
     existe = await db.execute(text("SELECT id FROM equipos WHERE codigo_interno = :c"), {"c": payload["codigo_interno"]})
     if existe.fetchone():
         raise HTTPException(400, "Código interno ya existe")
-    import uuid
     eid = str(uuid.uuid4())
-    try:
-       qr_base64 = "TEST_QR_SIMPLE"
-        print(f"POST QR OK len={len(qr_base64)}", flush=True)
-    except Exception as ex:
-        print(f"POST QR ERROR: {ex}", flush=True)
-        qr_base64 = None
-    print(f"qr_base64 type: {type(qr_base64)}, is None: {qr_base64 is None}", flush=True)
+    qr_base64 = generar_qr_base64(payload["codigo_interno"])
     await db.execute(text("""
         INSERT INTO equipos (id, nombre, codigo_interno, codigo_sap, ubicacion, sector,
                              marca, modelo, anio, horometro_inicial, horometro_actual,
@@ -370,25 +302,18 @@ async def relevador_crear_equipo(payload: dict, db: AsyncSession = Depends(get_d
 
 @router.put("/relevador/equipos/{equipo_id}")
 async def relevador_editar_equipo(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("relevador"))):
-    # Siempre regenerar QR
     result = await db.execute(text("SELECT codigo_interno FROM equipos WHERE id = :id"), {"id": equipo_id})
     equipo = result.fetchone()
     codigo = payload.get("codigo_interno", equipo.codigo_interno if equipo else None)
     data = dict(payload)
     if codigo:
-        try:
-            data["qr_code"] = generar_qr_base64(codigo)
-            print(f"QR OK para {codigo}, len={len(data['qr_code'])}", flush=True)
-        except Exception as ex:
-            print(f"QR ERROR: {ex}", flush=True)
-    print(f"data keys: {list(data.keys())}", flush=True)
+        data["qr_code"] = generar_qr_base64(codigo)
     sets, params = [], {"id": equipo_id}
     for campo in ["nombre", "codigo_sap", "ubicacion", "sector", "marca", "modelo", "anio",
                   "activo", "observaciones", "obs_relevador", "foto1_base64", "qr_code"]:
         if campo in data:
             sets.append(f"{campo} = :{campo}")
             params[campo] = data[campo]
-    print(f"sets: {sets}", flush=True)
     if sets:
         await db.execute(text(f"UPDATE equipos SET {', '.join(sets)} WHERE id = :id"), params)
         await db.commit()
@@ -414,7 +339,6 @@ async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), cu
     equipo = result.fetchone()
     if not equipo:
         raise HTTPException(404, "Equipo no encontrado")
-    import uuid
     await db.execute(text("""
         INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, observaciones)
         VALUES (:id, :eid, :uid, :lec, :ant, :obs)
@@ -423,7 +347,6 @@ async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), cu
            "obs": payload.get("observaciones")})
     await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
                      {"lec": payload["lectura"], "id": payload["equipo_id"]})
-    # Guardar observación del horometrista si viene
     if payload.get("obs_horometrista") is not None:
         await db.execute(text("UPDATE equipos SET obs_horometrista = :obs WHERE id = :id"),
                          {"obs": payload.get("obs_horometrista"), "id": payload["equipo_id"]})
@@ -434,10 +357,8 @@ async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), cu
 async def historial_horometro(equipo_id: str, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
     result = await db.execute(text("""
         SELECT h.lectura, h.lectura_anterior, h.fecha, h.observaciones, u.nombre_completo
-        FROM horometros h
-        LEFT JOIN usuarios u ON u.id = h.usuario_id
-        WHERE h.equipo_id = :eid
-        ORDER BY h.fecha DESC LIMIT 50
+        FROM horometros h LEFT JOIN usuarios u ON u.id = h.usuario_id
+        WHERE h.equipo_id = :eid ORDER BY h.fecha DESC LIMIT 50
     """), {"eid": equipo_id})
     rows = result.fetchall()
     return [{"lectura": r.lectura, "anterior": r.lectura_anterior,
@@ -446,20 +367,16 @@ async def historial_horometro(equipo_id: str, db: AsyncSession = Depends(get_db)
 
 @router.put("/horometrista/horometros/{equipo_id}/corregir")
 async def corregir_horometro(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
-    result = await db.execute(text("""
-        SELECT id, lectura FROM horometros WHERE equipo_id = :eid ORDER BY fecha DESC LIMIT 1
-    """), {"eid": equipo_id})
+    result = await db.execute(text("SELECT id, lectura FROM horometros WHERE equipo_id = :eid ORDER BY fecha DESC LIMIT 1"), {"eid": equipo_id})
     ultima = result.fetchone()
     if not ultima:
         raise HTTPException(404, "No hay lecturas para corregir")
-    import uuid
     await db.execute(text("""
         INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, es_correccion, lectura_original, motivo_correccion, observaciones)
         VALUES (:id, :eid, :uid, :lec, :ant, true, :orig, :motivo, :obs)
     """), {"id": str(uuid.uuid4()), "eid": equipo_id, "uid": current_user["id"],
-           "lec": payload["lectura"], "ant": ultima.lectura,
-           "orig": ultima.lectura, "motivo": payload.get("motivo", "Correccion manual"),
-           "obs": payload.get("observaciones")})
+           "lec": payload["lectura"], "ant": ultima.lectura, "orig": ultima.lectura,
+           "motivo": payload.get("motivo", "Correccion manual"), "obs": payload.get("observaciones")})
     await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
                      {"lec": payload["lectura"], "id": equipo_id})
     await db.commit()
@@ -468,30 +385,13 @@ async def corregir_horometro(equipo_id: str, payload: dict, db: AsyncSession = D
 # ─── OBSERVACIONES POR ROL ────────────────────────────────────────────────────
 
 @router.put("/equipo/{equipo_id}/observacion")
-async def guardar_observacion(
-    equipo_id: str,
-    payload: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """Guarda la observación del rol actual sobre el equipo."""
-    rol = current_user["rol"]
-    campo_map = {
-        "relevador": "obs_relevador",
-        "horometrista": "obs_horometrista",
-        "operario": "obs_operador",
-        "planificador": "obs_planificador",
-        "admin": "obs_planificador",
-    }
-    campo = campo_map.get(rol)
+async def guardar_observacion(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    campo_map = {"relevador": "obs_relevador", "horometrista": "obs_horometrista",
+                 "operario": "obs_operador", "planificador": "obs_planificador", "admin": "obs_planificador"}
+    campo = campo_map.get(current_user["rol"])
     if not campo:
         raise HTTPException(403, "Sin permiso para agregar observaciones")
     await db.execute(text(f"UPDATE equipos SET {campo} = :obs WHERE id = :id"),
                      {"obs": payload.get("observacion"), "id": equipo_id})
     await db.commit()
-    if qr_base64:
-        await db.execute(text("UPDATE equipos SET qr_code = :qr WHERE id = :id"),
-                        {"qr": qr_base64, "id": eid})
-        await db.commit()
-        print(f"QR UPDATE ejecutado para {eid}", flush=True)
     return {"ok": True}
