@@ -417,6 +417,8 @@ function scanFrame() {
       const c = url.searchParams.get('codigo');
       if (c) codigoDetectado = c;
     } catch(e) { /* valor crudo */ }
+    // DEBUG TEMPORAL — borrar después de confirmar
+    alert('QR leído: "' + qr.data + '"\nCódigo extraído: "' + codigoDetectado + '"');
     window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
     return;
   }
