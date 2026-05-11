@@ -307,7 +307,8 @@ function salir() {
 }
 
 actualizarNav();
-cargar();
+// Pequeño delay para asegurar que user esté cargado
+setTimeout(cargar, 50);
 </script>
 </body>
 </html>
