@@ -13,7 +13,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 FRONTEND_URL = "https://bucolic-frangipane-798714.netlify.app"
 
 def generar_qr_base64(codigo_interno: str) -> str:
-    url = f"{FRONTEND_URL}/equipo.html?codigo={codigo_interno}"
+    from urllib.parse import quote
+url = f"{FRONTEND_URL}/equipo.html?codigo={quote(codigo_interno)}"
     qr = qrcode.QRCode(version=1, box_size=10, border=2)
     qr.add_data(url)
     qr.make(fit=True)
