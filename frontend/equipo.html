@@ -103,12 +103,12 @@ function actualizarNav() {
 }
 
 async function cargar() {
- if (!codigo) {
+  if (!codigo) {
     const esInspector = user && (user.rol === 'inspector' || user.rol === 'gerencia');
     document.getElementById('main').innerHTML = esInspector
       ? `<div style="text-align:center;padding:40px 20px;">
           <div style="font-size:40px;margin-bottom:16px;">📷</div>
-          <div style="font-size:18px;font-weight:700;color:var(--cel2);margin-bottom:8px;">Bienvenido, ${user.nombre_completo}</div>
+          <div style="font-size:18px;font-weight:700;color:var(--cel2);margin-bottom:8px;">Bienvenido, ${user ? user.nombre_completo : ''}</div>
           <div style="font-size:14px;color:var(--txt2);">Escaneá el QR del equipo para ver su información.</div>
         </div>`
       : '<div class="empty">Código de equipo no especificado</div>';
