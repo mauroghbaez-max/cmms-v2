@@ -108,12 +108,47 @@ async def vista_autorizada_equipo(codigo_interno: str, db: AsyncSession = Depend
     """), {"eid": str(e.id)})
     ultimo = ultimo_r.fetchone()
 
-    proximo_r = await db.execute(text("""
-        SELECT p.nombre, p.horas_hito, p.horas_alerta FROM planes_mantenimiento p
-        WHERE p.equipo_id = :eid AND p.activo = true AND p.eliminado = false
-        ORDER BY p.horas_hito ASC LIMIT 1
+    # ─── FIX: traer todos los planes con su último servicio completado ──────
+    # Antes: ORDER BY horas_hito ASC LIMIT 1  →  siempre traía el de menor hito
+    # y calculaba hs_faltantes = horas_hito - horometro_actual (incorrecto).
+    # Ahora: calcula hs acumuladas desde el último servicio de CADA plan
+    # y elige el más urgente (menor hs_faltantes).
+    planes_r = await db.execute(text("""
+        SELECT
+            p.nombre,
+            p.horas_hito,
+            p.horas_alerta,
+            (
+                SELECT o.horometro_cierre
+                FROM ordenes_trabajo o
+                WHERE o.equipo_id = :eid
+                  AND o.plan_id   = p.id
+                  AND o.estado    = 'completada'
+                  AND o.horometro_cierre IS NOT NULL
+                ORDER BY o.fecha_cierre DESC
+                LIMIT 1
+            ) AS horometro_ultimo_servicio
+        FROM planes_mantenimiento p
+        WHERE p.equipo_id = :eid
+          AND p.activo    = true
+          AND p.eliminado = false
+        ORDER BY p.horas_hito ASC
     """), {"eid": str(e.id)})
-    proximo = proximo_r.fetchone()
+    planes = planes_r.fetchall()
+
+    proximo = None
+    proximo_hs_faltantes = None
+    h_actual = e.horometro_actual or 0
+
+    for plan in planes:
+        h_ultimo      = plan.horometro_ultimo_servicio or 0
+        hs_acumuladas = h_actual - h_ultimo
+        hs_faltantes  = round(plan.horas_hito - hs_acumuladas, 1)
+        # Elegir el plan más urgente (menor hs_faltantes, puede ser negativo = vencido)
+        if proximo_hs_faltantes is None or hs_faltantes < proximo_hs_faltantes:
+            proximo_hs_faltantes = hs_faltantes
+            proximo = plan
+    # ────────────────────────────────────────────────────────────────────────
 
     ot_activa_r = await db.execute(text("""
         SELECT o.numero, o.estado, o.mecanico_nombre, o.fecha_apertura, p.nombre AS plan_nombre
@@ -151,7 +186,7 @@ async def vista_autorizada_equipo(codigo_interno: str, db: AsyncSession = Depend
                             "observaciones": ultimo.observaciones_cierre} if ultimo else None,
         "proximo_servicio": {"plan": proximo.nombre, "horas_hito": proximo.horas_hito,
                              "horas_alerta": proximo.horas_alerta,
-                             "hs_faltantes": round(proximo.horas_hito - (e.horometro_actual or 0), 1)} if proximo else None,
+                             "hs_faltantes": proximo_hs_faltantes} if proximo else None,
         "historial": [{"numero": h.numero, "plan": h.plan_nombre,
                        "horometro_apertura": h.horometro_apertura, "horometro_cierre": h.horometro_cierre,
                        "mecanico": h.mecanico_nombre,
