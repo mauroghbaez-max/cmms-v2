@@ -56,6 +56,22 @@ main{padding:20px;max-width:800px;margin:0 auto;}
 .alert{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;}
 .alert-warn{background:rgba(245,158,11,0.08);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
 .ot-activa{background:rgba(37,99,168,0.15);border:0.5px solid var(--cel1);border-radius:var(--r-sm);padding:12px 16px;margin-bottom:8px;}
+
+/* ── QR Scanner ── */
+.qr-wrap{position:relative;width:100%;max-width:340px;margin:20px auto 0;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--cel1);background:#000;}
+.qr-wrap video{display:block;width:100%;height:auto;}
+.qr-overlay{position:absolute;inset:0;pointer-events:none;}
+.qr-corner{position:absolute;width:28px;height:28px;border-color:var(--cel2);border-style:solid;}
+.qr-corner.tl{top:12px;left:12px;border-width:3px 0 0 3px;}
+.qr-corner.tr{top:12px;right:12px;border-width:3px 3px 0 0;}
+.qr-corner.bl{bottom:12px;left:12px;border-width:0 0 3px 3px;}
+.qr-corner.br{bottom:12px;right:12px;border-width:0 3px 3px 0;}
+.qr-line{position:absolute;left:12px;right:12px;height:2px;background:var(--cel1);opacity:0.7;animation:scan 2s linear infinite;}
+@keyframes scan{0%{top:15%;}100%{top:85%;}}
+.btn-scan{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:11px 28px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:14px;font-weight:700;margin-top:24px;letter-spacing:0.04em;}
+.btn-scan:hover{background:var(--cel1);}
+.btn-cancelar-scan{background:transparent;border:0.5px solid var(--border);color:var(--txt3);padding:8px 20px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;margin-top:10px;}
+.qr-status{font-size:12px;color:var(--txt3);margin-top:10px;min-height:18px;}
 </style>
 </head>
 <body>
@@ -85,6 +101,7 @@ main{padding:20px;max-width:800px;margin:0 auto;}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
 const API = 'https://cmms-v2-production.up.railway.app/api/v1';
 const params = new URLSearchParams(window.location.search);
@@ -114,14 +131,20 @@ async function cargar() {
     // Sin código QR en la URL → decidir por rol
     const esInspector = user && (user.rol === 'inspector' || user.rol === 'gerencia');
     document.getElementById('main').innerHTML = esInspector
-      ? `<div style="text-align:center;padding:60px 20px;">
-          <div style="font-size:56px;margin-bottom:20px;">📷</div>
-          <div style="font-size:20px;font-weight:700;color:var(--cel2);margin-bottom:10px;">
+      ? `<div style="text-align:center;padding:40px 20px 20px;">
+          <div style="font-size:52px;margin-bottom:16px;">📷</div>
+          <div style="font-size:20px;font-weight:700;color:var(--cel2);margin-bottom:8px;">
             Bienvenido, ${user.nombre_completo}
           </div>
-          <div style="font-size:14px;color:var(--txt2);max-width:280px;margin:0 auto;line-height:1.6;">
-            Escaneá el código QR pegado en el equipo para ver su ficha completa.
+          <div style="font-size:14px;color:var(--txt2);max-width:280px;margin:0 auto 0;line-height:1.6;">
+            Escaneá el QR del equipo para ver su ficha.
           </div>
+          <div>
+            <button class="btn-scan" id="btn-iniciar-scan" onclick="iniciarScanner()">
+              Abrir cámara
+            </button>
+          </div>
+          <div id="qr-scanner-area"></div>
         </div>`
       : '<div class="empty">Código de equipo no especificado.</div>';
     return;
@@ -323,6 +346,82 @@ function salir() {
   actualizarNav();
   cargar();
 }
+
+// ── QR Scanner ──────────────────────────────────────────────────────────────
+let scanStream = null;
+let scanRAF = null;
+
+function iniciarScanner() {
+  const area = document.getElementById('qr-scanner-area');
+  if (!area) return;
+  document.getElementById('btn-iniciar-scan').style.display = 'none';
+
+  area.innerHTML = `
+    <div class="qr-wrap" id="qr-wrap">
+      <video id="qr-video" playsinline autoplay muted></video>
+      <canvas id="qr-canvas" style="display:none;"></canvas>
+      <div class="qr-overlay">
+        <div class="qr-corner tl"></div><div class="qr-corner tr"></div>
+        <div class="qr-corner bl"></div><div class="qr-corner br"></div>
+        <div class="qr-line"></div>
+      </div>
+    </div>
+    <div class="qr-status" id="qr-status">Apuntá la cámara al código QR…</div>
+    <div><button class="btn-cancelar-scan" onclick="detenerScanner()">Cancelar</button></div>
+  `;
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+      scanStream = stream;
+      const video = document.getElementById('qr-video');
+      video.srcObject = stream;
+      video.play();
+      video.addEventListener('loadedmetadata', () => scanFrame());
+    })
+    .catch(err => {
+      area.innerHTML = `<div class="qr-status" style="color:var(--danger);margin-top:16px;">
+        No se pudo acceder a la cámara.<br><small>${err.message}</small>
+      </div>`;
+      document.getElementById('btn-iniciar-scan').style.display = '';
+    });
+}
+
+function scanFrame() {
+  const video = document.getElementById('qr-video');
+  const canvas = document.getElementById('qr-canvas');
+  if (!video || !canvas || video.readyState < 2) {
+    scanRAF = requestAnimationFrame(scanFrame); return;
+  }
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const qr = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
+  if (qr) {
+    detenerScanner();
+    // Extraer código: puede ser URL completa o valor crudo
+    let codigoDetectado = qr.data;
+    try {
+      const url = new URL(qr.data);
+      const c = url.searchParams.get('codigo');
+      if (c) codigoDetectado = c;
+    } catch(e) { /* no es URL, usar valor crudo */ }
+    window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
+    return;
+  }
+  scanRAF = requestAnimationFrame(scanFrame);
+}
+
+function detenerScanner() {
+  if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  const area = document.getElementById('qr-scanner-area');
+  if (area) area.innerHTML = '';
+  const btn = document.getElementById('btn-iniciar-scan');
+  if (btn) btn.style.display = '';
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 actualizarNav();
 setTimeout(cargar, 50);
