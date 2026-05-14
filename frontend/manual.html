@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANTEN. — Manual de Usuario</title>
+<style>
+:root{
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
+  --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+nav{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;}
+.logo{font-size:22px;font-weight:700;color:var(--v3);letter-spacing:0.12em;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.nav-badge{background:rgba(124,58,237,0.2);color:var(--v3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(124,58,237,0.35);}
+.spacer{flex:1;}
+.btn-nav{background:transparent;border:0.5px solid var(--border);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s;}
+.btn-nav:hover{background:rgba(124,58,237,0.1);color:var(--txt1);border-color:var(--v1);}
+.btn-pdf{background:var(--v1);border:0.5px solid var(--v2);color:#fff;padding:6px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;box-shadow:0 2px 8px rgba(124,58,237,0.3);transition:all 0.15s;}
+.btn-pdf:hover{background:var(--v2);}
+
+.layout{display:flex;max-width:1200px;margin:0 auto;padding:24px;gap:24px;}
+.sidebar{width:220px;flex-shrink:0;}
+.sidebar-sticky{position:sticky;top:72px;}
+.sidebar ul{list-style:none;}
+.sidebar li{margin-bottom:2px;}
+.sidebar a{display:block;padding:7px 12px;border-radius:var(--r-sm);font-size:12px;color:var(--txt2);text-decoration:none;transition:all 0.15s;border:0.5px solid transparent;}
+.sidebar a:hover{background:rgba(124,58,237,0.1);color:var(--v3);border-color:var(--border);}
+.sidebar a.act{background:rgba(124,58,237,0.2);color:var(--v3);border-color:rgba(124,58,237,0.35);font-weight:700;}
+.sidebar-section{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;padding:10px 12px 4px;margin-top:8px;}
+
+.content{flex:1;min-width:0;}
+.section{display:none;}.section.act{display:block;}
+h1{font-size:26px;font-weight:700;color:var(--v3);margin-bottom:8px;line-height:1.2;}
+.section-lead{font-size:14px;color:var(--txt2);margin-bottom:24px;line-height:1.5;}
+h2{font-size:16px;font-weight:700;color:var(--v3);margin:28px 0 10px;padding-bottom:6px;border-bottom:0.5px solid var(--border);}
+h3{font-size:13px;font-weight:700;color:var(--txt1);margin:18px 0 8px;text-transform:uppercase;letter-spacing:0.06em;}
+p{font-size:13px;color:var(--txt2);line-height:1.65;margin-bottom:10px;}
+ul,ol{padding-left:20px;margin-bottom:12px;}
+li{font-size:13px;color:var(--txt2);line-height:1.65;margin-bottom:4px;}
+li strong{color:var(--txt1);}
+.card{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;backdrop-filter:blur(8px);}
+.step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
+.step-num{background:var(--v1);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step-body{flex:1;}
+.step-title{font-size:13px;font-weight:700;color:var(--txt1);margin-bottom:3px;}
+.step-desc{font-size:12px;color:var(--txt2);line-height:1.6;}
+.badge{display:inline-block;font-size:11px;padding:2px 10px;border-radius:20px;font-weight:700;margin-right:4px;}
+.b-admin{background:rgba(124,58,237,0.2);color:var(--v3);border:0.5px solid rgba(124,58,237,0.35);}
+.b-plan{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
+.b-rrhh{background:rgba(245,158,11,0.12);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
+.b-panol{background:rgba(59,130,246,0.15);color:#93c5fd;border:0.5px solid rgba(59,130,246,0.3);}
+.b-horo{background:rgba(236,72,153,0.15);color:#f9a8d4;border:0.5px solid rgba(236,72,153,0.3);}
+.b-rel{background:rgba(251,146,60,0.15);color:#fdba74;border:0.5px solid rgba(251,146,60,0.3);}
+.b-oper{background:rgba(52,211,153,0.15);color:#6ee7b7;border:0.5px solid rgba(52,211,153,0.3);}
+.alert{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:14px;line-height:1.5;}
+.alert-info{background:rgba(124,58,237,0.1);border:0.5px solid rgba(124,58,237,0.3);color:var(--v3);}
+.alert-warn{background:rgba(245,158,11,0.08);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
+.alert-ok{background:rgba(16,185,129,0.08);border:0.5px solid rgba(16,185,129,0.3);color:var(--ok);}
+.role-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.role-card{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all 0.15s;}
+.role-card:hover{border-color:var(--v1);background:rgba(42,27,82,0.6);}
+.role-card .role-name{font-size:14px;font-weight:700;color:var(--txt1);margin-bottom:4px;}
+.role-card .role-desc{font-size:11px;color:var(--txt3);line-height:1.4;}
+table.ref{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;}
+table.ref th{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.07em;padding:7px 10px;border-bottom:0.5px solid var(--border);text-align:left;}
+table.ref td{padding:8px 10px;border-bottom:0.5px solid rgba(124,58,237,0.1);color:var(--txt2);vertical-align:top;}
+table.ref tr:last-child td{border-bottom:none;}
+
+@media print {
+  nav{display:none;}
+  .sidebar{display:none;}
+  .layout{display:block;padding:0;}
+  .section{display:block!important;}
+  body{background:#fff;color:#111;}
+  h1,h2,h3{color:#2a1b52;}
+  p,li{color:#333;}
+  .card{background:#f9f9f9;border:1px solid #ddd;box-shadow:none;}
+  .step-num{background:#7c3aed;print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+  .badge{print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+  .alert{border:1px solid #ccc;background:#f5f5f5;color:#333;}
+  a{color:#333;}
+  .btn-pdf{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">MANTEN.</span>
+  <span class="nav-badge">Manual de Usuario</span>
+  <span class="spacer"></span>
+  <button class="btn-pdf" onclick="window.print()">📥 Descargar PDF</button>
+  <a href="javascript:history.back()" class="btn-nav">← Volver</a>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-sticky">
+      <ul>
+        <li class="sidebar-section">General</li>
+        <li><a href="#" class="act" onclick="ir('intro',this)">Introducción</a></li>
+        <li><a href="#" onclick="ir('flujo',this)">Flujo de trabajo</a></li>
+        <li><a href="#" onclick="ir('login',this)">Acceso al sistema</a></li>
+        <li class="sidebar-section">Roles</li>
+        <li><a href="#" onclick="ir('admin',this)">Administrador</a></li>
+        <li><a href="#" onclick="ir('planificador',this)">Planificador</a></li>
+        <li><a href="#" onclick="ir('rrhh',this)">RRHH</a></li>
+        <li><a href="#" onclick="ir('panol',this)">Pañol</a></li>
+        <li><a href="#" onclick="ir('horometrista',this)">Horometrista</a></li>
+        <li><a href="#" onclick="ir('relevador',this)">Relevador</a></li>
+        <li><a href="#" onclick="ir('operario',this)">Operario</a></li>
+        <li class="sidebar-section">Referencia</li>
+        <li><a href="#" onclick="ir('estados',this)">Estados de OT</a></li>
+        <li><a href="#" onclick="ir('semaforo',this)">Semáforo</a></li>
+        <li><a href="#" onclick="ir('glosario',this)">Glosario</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- INTRO -->
+    <div class="section act" id="sec-intro">
+      <h1>Manual de Usuario — MANTEN.</h1>
+      <p class="section-lead">MANTEN. es un sistema CMMS (Computerized Maintenance Management System) diseñado para la gestión de mantenimiento industrial. Permite planificar servicios preventivos, registrar lecturas de horómetro, gestionar órdenes de trabajo y controlar recursos humanos y materiales de manera integrada.</p>
+
+      <h2>¿Qué hace MANTEN.?</h2>
+      <div class="card">
+        <ul>
+          <li><strong>Seguimiento de horómetros</strong>: registra las horas de operación de cada equipo y dispara alertas cuando se acerca un servicio.</li>
+          <li><strong>Planes de mantenimiento preventivo</strong>: define hitos de servicio (cada N horas) con listas de materiales y personal necesario.</li>
+          <li><strong>Órdenes de Trabajo (OT)</strong>: documenta cada intervención, desde la apertura hasta el cierre, con trazabilidad completa.</li>
+          <li><strong>Correctivas</strong>: cualquier operario o relevador puede solicitar una reparación; el planificador la evalúa y convierte en OT.</li>
+          <li><strong>Control de EPP y materiales</strong>: RRHH asigna personal y EPP; pañol confirma entrega de materiales.</li>
+          <li><strong>Trazabilidad completa</strong>: todos los eventos quedan registrados con usuario, fecha y hora.</li>
+        </ul>
+      </div>
+
+      <h2>Roles del sistema</h2>
+      <div class="role-grid">
+        <div class="role-card" onclick="ir('admin',null)">
+          <div class="role-name"><span class="badge b-admin">Admin</span></div>
+          <div class="role-desc">Configura la empresa, gestiona usuarios y audita la trazabilidad.</div>
+        </div>
+        <div class="role-card" onclick="ir('planificador',null)">
+          <div class="role-name"><span class="badge b-plan">Planificador</span></div>
+          <div class="role-desc">Crea y gestiona planes de servicio, emite OTs y controla el semáforo de horómetros.</div>
+        </div>
+        <div class="role-card" onclick="ir('rrhh',null)">
+          <div class="role-name"><span class="badge b-rrhh">RRHH</span></div>
+          <div class="role-desc">Asigna mecánicos, carga EPP y autoriza cada OT para su ejecución.</div>
+        </div>
+        <div class="role-card" onclick="ir('panol',null)">
+          <div class="role-name"><span class="badge b-panol">Pañol</span></div>
+          <div class="role-desc">Entrega materiales y EPP para las OTs autorizadas; gestiona stock de preventivos.</div>
+        </div>
+        <div class="role-card" onclick="ir('horometrista',null)">
+          <div class="role-name"><span class="badge b-horo">Horometrista</span></div>
+          <div class="role-desc">Carga lecturas diarias de horómetro y corrige errores del día.</div>
+        </div>
+        <div class="role-card" onclick="ir('relevador',null)">
+          <div class="role-name"><span class="badge b-rel">Relevador</span></div>
+          <div class="role-desc">Inspecciona equipos en campo, genera QR y reporta novedades.</div>
+        </div>
+        <div class="role-card" onclick="ir('operario',null)">
+          <div class="role-name"><span class="badge b-oper">Operario</span></div>
+          <div class="role-desc">Ejecuta las OTs en campo: escanea QR, completa el checklist y cierra la orden.</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        Para navegar al manual de cada rol, hacé clic en la tarjeta de arriba o usá el menú lateral izquierdo. Para guardar como PDF, usá el botón <strong>📥 Descargar PDF</strong> en la barra superior (el navegador abrirá el diálogo de impresión — elegí "Guardar como PDF").
+      </div>
+    </div>
+
+    <!-- FLUJO -->
+    <div class="section" id="sec-flujo">
+      <h1>Flujo de trabajo</h1>
+      <p class="section-lead">Una OT preventiva atraviesa estas etapas de manera secuencial. Cada rol tiene responsabilidades específicas en cada paso.</p>
+
+      <h2>OT Preventiva</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-horo">Horometrista</span> Carga de horómetro</div>
+          <div class="step-desc">El horometrista registra la lectura diaria de horas en cada equipo. El sistema calcula automáticamente las horas acumuladas desde el último servicio y actualiza el semáforo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-plan">Planificador</span> Detección de alerta y emisión de OT</div>
+          <div class="step-desc">Cuando el semáforo pasa a amarillo (horas de alerta alcanzadas) o rojo (hito superado), el planificador crea una OT vinculada al plan de servicio correspondiente. La OT queda en estado <em>Pendiente RRHH</em>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-rrhh">RRHH</span> Asignación y autorización</div>
+          <div class="step-desc">RRHH asigna el mecánico responsable, carga los EPP requeridos y autoriza la OT. La OT pasa a estado <em>Autorizada</em>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-plan">Planificador</span> Impresión de OT</div>
+          <div class="step-desc">El planificador imprime la OT (o la guarda como PDF). Este acto notifica al pañol que debe preparar los materiales.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-panol">Pañol</span> Entrega de materiales</div>
+          <div class="step-desc">El pañolero ve la OT en su panel, confirma la entrega de materiales y EPP al mecánico. La OT pasa a estado <em>En ejecución</em>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-oper">Operario</span> Ejecución y cierre</div>
+          <div class="step-desc">El operario escanea el QR del equipo con su dispositivo móvil, completa el checklist de la OT y carga el horómetro de cierre. La OT pasa a estado <em>Completada</em>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-plan">Planificador</span> Impresión de cierre</div>
+          <div class="step-desc">El planificador puede imprimir el documento de cierre de OT con todos los datos de la intervención.</div>
+        </div>
+      </div>
+
+      <h2>OT Correctiva</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-oper">Operario</span> / <span class="badge b-rel">Relevador</span> Solicitud de correctiva</div>
+          <div class="step-desc">El operario o relevador detecta una falla en campo, completa el formulario de solicitud correctiva con descripción y nivel de urgencia.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title"><span class="badge b-plan">Planificador</span> Evaluación</div>
+          <div class="step-desc">El planificador recibe la solicitud en el panel "Solicitudes". Puede aprobarla (creando automáticamente una OT correctiva) o rechazarla con un motivo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Continúa como OT normal</div>
+          <div class="step-desc">Una vez creada, la OT correctiva sigue el mismo flujo de autorización RRHH → Pañol → Operario que una preventiva.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="section" id="sec-login">
+      <h1>Acceso al sistema</h1>
+      <p class="section-lead">MANTEN. utiliza autenticación con usuario y contraseña. El administrador crea las cuentas; cada usuario accede con sus credenciales.</p>
+
+      <h2>Pasos para ingresar</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ingresar credenciales</div>
+          <div class="step-desc">En la pantalla de inicio, escribí tu usuario (nombre de usuario o email) y tu contraseña. Presioná <strong>Ingresar</strong> o la tecla Enter.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Redirección automática</div>
+          <div class="step-desc">El sistema detecta tu rol y te redirige directamente a tu panel de trabajo. No necesitás elegir manualmente qué pantalla abrir.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Cerrar sesión</div>
+          <div class="step-desc">Usá siempre el botón <strong>Salir</strong> del menú superior para cerrar la sesión de forma segura. No cerrés la ventana sin salir primero.</div>
+        </div>
+      </div>
+      <div class="alert alert-warn">Si olvidaste tu contraseña, contactá al administrador del sistema. No hay recuperación automática por email.</div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="section" id="sec-admin">
+      <h1><span class="badge b-admin">Admin</span> Administrador</h1>
+      <p class="section-lead">El administrador configura el sistema, gestiona usuarios y tiene acceso completo a la trazabilidad de todas las operaciones.</p>
+
+      <h2>Panel: Empresa</h2>
+      <p>Configurá el nombre y los datos de tu empresa. Estos datos aparecen en los documentos impresos (OTs, cierres) y en el logo del sistema.</p>
+      <ul>
+        <li><strong>Nombre empresa</strong>: aparece en la barra superior de todas las pantallas.</li>
+        <li><strong>CUIT / Razón social</strong>: datos legales para los documentos.</li>
+      </ul>
+
+      <h2>Panel: Usuarios</h2>
+      <p>Gestioná todas las cuentas del sistema.</p>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Crear usuario</div>
+          <div class="step-desc">Completá nombre completo, usuario, contraseña y rol. El rol determina a qué pantalla accede y qué acciones puede realizar.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Editar usuario</div>
+          <div class="step-desc">Podés cambiar datos, rol o contraseña de cualquier usuario. Dejá la contraseña en blanco si no querés cambiarla.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Activar / desactivar</div>
+          <div class="step-desc">Un usuario desactivado no puede ingresar al sistema pero su historial se preserva.</div>
+        </div>
+      </div>
+
+      <h2>Panel: Trazabilidad</h2>
+      <p>Vista global de todas las OTs con fechas clave: liberación de materiales (pañol), aprobación RRHH y cierre por operario. Útil para auditorías y control de cumplimiento.</p>
+
+      <h2>Panel: Accesos</h2>
+      <p>Registro de todos los ingresos al sistema con usuario, rol, fecha y hora. Permite detectar accesos no autorizados o inconsistencias.</p>
+    </div>
+
+    <!-- PLANIFICADOR -->
+    <div class="section" id="sec-planificador">
+      <h1><span class="badge b-plan">Planificador</span> Planificador</h1>
+      <p class="section-lead">El planificador es el rol central del sistema. Crea los planes de mantenimiento, emite las OTs, controla el semáforo de horómetros y gestiona las solicitudes de correctivas.</p>
+
+      <h2>Panel: Reporte (Semáforo)</h2>
+      <p>Vista en tiempo real del estado de mantenimiento de todos los equipos.</p>
+      <table class="ref">
+        <thead><tr><th>Indicador</th><th>Significado</th><th>Acción recomendada</th></tr></thead>
+        <tbody>
+          <tr><td>🟢 Verde</td><td>Las horas acumuladas están por debajo del umbral de alerta.</td><td>Sin acción inmediata.</td></tr>
+          <tr><td>🟡 Amarillo</td><td>Las horas acumuladas superaron el umbral de alerta (horas_hito − horas_alerta).</td><td>Programar la OT preventiva pronto.</td></tr>
+          <tr><td>🔴 Rojo</td><td>Las horas acumuladas superaron el hito de servicio. El equipo está vencido.</td><td>Emitir la OT de inmediato.</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li>Usá el botón <strong>Exportar Excel</strong> para compartir el reporte con supervisores.</li>
+        <li>El botón <strong>Historial</strong> muestra todas las OTs anteriores de ese equipo.</li>
+        <li>El botón <strong>Corregir hs</strong> permite ajustar el horómetro con un motivo obligatorio (queda auditado).</li>
+      </ul>
+
+      <h2>Panel: Planes</h2>
+      <p>Define los servicios preventivos de cada equipo.</p>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Seleccionar equipo</div>
+          <div class="step-desc">Elegí el equipo del selector superior. Se muestran sus planes activos.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Crear plan</div>
+          <div class="step-desc">Completá: nombre (ej. "Service 500 hs"), horas hito, horas de alerta anticipada y cantidad de personal. Agregá los materiales necesarios con código SAP, descripción y cantidad.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Editar plan</div>
+          <div class="step-desc">Toda modificación requiere un <strong>motivo obligatorio</strong>. El cambio queda auditado con tu nombre y fecha.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Eliminar plan</div>
+          <div class="step-desc">La eliminación también requiere motivo. El plan no se borra físicamente; queda marcado como eliminado en el historial.</div>
+        </div>
+      </div>
+
+      <h2>Panel: OTs</h2>
+      <p>Lista y gestión de todas las órdenes de trabajo.</p>
+      <ul>
+        <li>Filtrá por estado o tipo (preventiva / correctiva).</li>
+        <li>Presioná <strong>Ver</strong> para ver el detalle completo de una OT.</li>
+        <li>Las OTs aprobadas por RRHH tienen el botón <strong>Imprimir</strong>; al presionarlo se registra la impresión en el sistema y el pañol recibe la tarea.</li>
+        <li>Las OTs completadas tienen el botón <strong>Imprimir cierre OT</strong> con todos los datos del servicio realizado.</li>
+      </ul>
+
+      <h2>Panel: Solicitudes</h2>
+      <p>Solicitudes de correctivas enviadas por operarios y relevadores.</p>
+      <ul>
+        <li><strong>Aprobar OT</strong>: crea automáticamente una OT correctiva y la vincula a la solicitud.</li>
+        <li><strong>Rechazar</strong>: requiere motivo; la solicitud queda en historial como rechazada.</li>
+      </ul>
+
+      <h2>Panel: Equipos</h2>
+      <p>Vista general de todos los equipos registrados con su horómetro, planes y estado de actividad.</p>
+    </div>
+
+    <!-- RRHH -->
+    <div class="section" id="sec-rrhh">
+      <h1><span class="badge b-rrhh">RRHH</span> Recursos Humanos</h1>
+      <p class="section-lead">RRHH asigna el personal mecánico a cada OT, carga los equipos de protección personal (EPP) y autoriza la orden para que pueda ejecutarse.</p>
+
+      <h2>Panel: Pendientes</h2>
+      <p>OTs en estado "Pendiente RRHH" que esperan asignación y autorización.</p>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Abrir la OT</div>
+          <div class="step-desc">Hacé clic en <strong>Autorizar</strong> para abrir el formulario de asignación.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Asignar mecánico</div>
+          <div class="step-desc">Seleccioná el mecánico responsable del listado de personal disponible.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Cargar EPP</div>
+          <div class="step-desc">Agregá los elementos de protección que debe usar el mecánico (casco, guantes, arnés, etc.).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Autorizar</div>
+          <div class="step-desc">Al confirmar, la OT pasa a estado "Autorizada" y queda disponible para el planificador para imprimir y para el pañol para preparar materiales.</div>
+        </div>
+      </div>
+
+      <h2>Panel: Historial</h2>
+      <p>OTs ya aprobadas por RRHH, en cualquier estado posterior (autorizada, en ejecución, completada). Permite consultar qué mecánico fue asignado a cada servicio.</p>
+
+      <div class="alert alert-warn">Si una OT fue rechazada por error, el administrador puede cambiar su estado desde el panel de trazabilidad.</div>
+    </div>
+
+    <!-- PAÑOL -->
+    <div class="section" id="sec-panol">
+      <h1><span class="badge b-panol">Pañol</span> Pañol</h1>
+      <p class="section-lead">El pañolero gestiona la entrega de materiales y EPP. Ve las OTs que ya fueron impresas (listas para preparar) y confirma la entrega al mecánico.</p>
+
+      <h2>Panel: Ordenes pendientes</h2>
+      <p>OTs que el planificador ya imprimió y que esperan la entrega de materiales.</p>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ver materiales</div>
+          <div class="step-desc">Cada OT muestra por separado los materiales del plan (del plan de mantenimiento) y los materiales extra (agregados al crear la OT). También muestra el EPP asignado por RRHH.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Imprimir remito</div>
+          <div class="step-desc">Podés imprimir o guardar como PDF el remito de entrega de materiales para incluir en el legajo físico.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Confirmar entrega</div>
+          <div class="step-desc">Al presionar <strong>Confirmar entrega</strong>, la OT pasa a estado "En ejecución" y desaparece de la lista de pendientes.</div>
+        </div>
+      </div>
+
+      <h2>Panel: Preventivos próximos</h2>
+      <p>Equipos con semáforo amarillo o rojo cuyos planes tienen materiales definidos. Permite preparar el stock con anticipación antes de que se emita la OT.</p>
+    </div>
+
+    <!-- HOROMETRISTA -->
+    <div class="section" id="sec-horometrista">
+      <h1><span class="badge b-horo">Horometrista</span> Horometrista</h1>
+      <p class="section-lead">El horometrista recorre los equipos activos y registra la lectura actual del horómetro de cada uno. Es la fuente principal de datos para el semáforo de mantenimiento.</p>
+
+      <h2>Cargar una lectura</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Buscar el equipo</div>
+          <div class="step-desc">Usá el campo de búsqueda para filtrar por nombre o código, o escaneá el código QR del equipo con el botón <strong>📷 Escanear QR</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Presionar "+ Lectura"</div>
+          <div class="step-desc">Ingresá las horas actuales que muestra el horómetro físico del equipo. El campo acepta decimales (ej. 1523.5). Podés agregar una observación opcional.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Guardar</div>
+          <div class="step-desc">La lectura se registra con tu usuario y la fecha/hora exacta. El semáforo del planificador se actualiza automáticamente.</div>
+        </div>
+      </div>
+
+      <h2>Corregir una lectura</h2>
+      <div class="alert alert-warn">Solo podés corregir la lectura del <strong>día de hoy</strong>. La corrección queda auditada con el motivo.</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Presionar "Corregir"</div>
+          <div class="step-desc">Ingresá el valor correcto y explicá el motivo de la corrección (error de tipeo, lectura incorrecta, etc.).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELEVADOR -->
+    <div class="section" id="sec-relevador">
+      <h1><span class="badge b-rel">Relevador</span> Relevador</h1>
+      <p class="section-lead">El relevador inspecciona los equipos en campo, genera códigos QR para identificación y reporta novedades al planificador.</p>
+
+      <h2>Ver y buscar equipos</h2>
+      <p>La pantalla muestra todos los equipos activos en tarjetas. Podés buscar por nombre, código SAP o ubicación usando el campo de búsqueda. También podés filtrar por sector.</p>
+
+      <h2>Ver ficha del equipo</h2>
+      <p>Hacé clic en cualquier tarjeta para ver la ficha completa del equipo: datos técnicos, horómetro actual y OT activa si la hay.</p>
+
+      <h2>Generar QR</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Abrir la ficha del equipo</div>
+          <div class="step-desc">Hacé clic en la tarjeta del equipo para ver su detalle.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Presionar "Ver QR"</div>
+          <div class="step-desc">Se genera un código QR con el código interno del equipo. Podés descargarlo como imagen para imprimirlo y pegarlo en el equipo físico.</div>
+        </div>
+      </div>
+
+      <h2>Solicitar correctiva</h2>
+      <p>Desde la ficha del equipo, si detectás una falla, podés enviar una solicitud de correctiva al planificador con descripción y nivel de urgencia (normal / urgente).</p>
+    </div>
+
+    <!-- OPERARIO -->
+    <div class="section" id="sec-operario">
+      <h1><span class="badge b-oper">Operario</span> Operario</h1>
+      <p class="section-lead">El operario ejecuta las órdenes de trabajo en campo. La interfaz está optimizada para dispositivos móviles y funciona en pantalla completa.</p>
+
+      <h2>Ejecutar una OT</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Escanear el QR del equipo</div>
+          <div class="step-desc">Presioná <strong>Escanear equipo</strong> y apuntá la cámara al código QR pegado en el equipo. El sistema identifica el equipo automáticamente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Ver la OT activa</div>
+          <div class="step-desc">Si el equipo tiene una OT en estado "En ejecución", se muestra automáticamente con todos sus datos: descripción, materiales, EPP requerido.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Completar el checklist</div>
+          <div class="step-desc">Marcá cada ítem del checklist a medida que lo realizás. El progreso se muestra con una barra de avance.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Cargar horómetro de cierre</div>
+          <div class="step-desc">Ingresá la lectura final del horómetro al terminar el servicio. Este valor es el punto de partida para calcular las próximas horas acumuladas.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Cerrar la OT</div>
+          <div class="step-desc">Al confirmar el cierre, la OT pasa a estado "Completada". El semáforo del planificador se reinicia para ese equipo.</div>
+        </div>
+      </div>
+
+      <h2>Solicitar correctiva</h2>
+      <p>Si detectás una falla que no corresponde a una OT existente, podés envirar una solicitud de correctiva desde la pantalla de inicio. Describí la falla y marcá si es urgente.</p>
+
+      <div class="alert alert-ok">El cierre de la OT reinicia el contador de horas acumuladas del equipo. Asegurate de ingresar el horómetro correcto.</div>
+    </div>
+
+    <!-- ESTADOS -->
+    <div class="section" id="sec-estados">
+      <h1>Estados de una OT</h1>
+      <p class="section-lead">Cada OT recorre estos estados durante su ciclo de vida. Solo puede avanzar; no puede retroceder (salvo cancelación).</p>
+      <table class="ref">
+        <thead><tr><th>Estado</th><th>Descripción</th><th>Quién puede avanzar</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pendiente RRHH</strong></td><td>La OT fue creada y espera asignación de mecánico y EPP.</td><td>RRHH</td></tr>
+          <tr><td><strong>Autorizada</strong></td><td>RRHH aprobó la OT. El planificador puede imprimirla.</td><td>Planificador (impresión)</td></tr>
+          <tr><td><strong>En ejecución</strong></td><td>El pañol entregó los materiales. El operario ejecuta el servicio.</td><td>Operario (cierre)</td></tr>
+          <tr><td><strong>Completada</strong></td><td>El operario cerró la OT. El servicio fue realizado.</td><td>— (estado final)</td></tr>
+          <tr><td><strong>Cancelada</strong></td><td>La OT fue cancelada por el planificador o admin.</td><td>— (estado final)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SEMAFORO -->
+    <div class="section" id="sec-semaforo">
+      <h1>Semáforo de horómetros</h1>
+      <p class="section-lead">El semáforo es el indicador central del estado de mantenimiento preventivo. Se calcula automáticamente a partir del horómetro actual y los parámetros del plan.</p>
+
+      <h2>Cálculo</h2>
+      <table class="ref">
+        <thead><tr><th>Variable</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Horómetro actual</strong></td><td>Última lectura cargada por el horometrista.</td></tr>
+          <tr><td><strong>Horómetro último servicio</strong></td><td>Lectura registrada al cerrar la última OT del plan.</td></tr>
+          <tr><td><strong>Hs acumuladas</strong></td><td>Horómetro actual − Horómetro último servicio.</td></tr>
+          <tr><td><strong>Horas hito</strong></td><td>Definido en el plan (ej. 500 hs). Cuándo debe realizarse el servicio.</td></tr>
+          <tr><td><strong>Horas alerta</strong></td><td>Definido en el plan (ej. 150 hs antes del hito). Cuándo avisar.</td></tr>
+          <tr><td><strong>Hs faltantes</strong></td><td>Horas hito − Hs acumuladas. Negativo = vencido.</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Lógica del semáforo</h2>
+      <table class="ref">
+        <thead><tr><th>Color</th><th>Condición</th></tr></thead>
+        <tbody>
+          <tr><td>🟢 Verde</td><td>Hs acumuladas &lt; (Horas hito − Horas alerta)</td></tr>
+          <tr><td>🟡 Amarillo</td><td>Hs acumuladas ≥ (Horas hito − Horas alerta) y &lt; Horas hito</td></tr>
+          <tr><td>🔴 Rojo</td><td>Hs acumuladas ≥ Horas hito (servicio vencido)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-info"><strong>Ejemplo</strong>: Plan "Service 500 hs" con alerta a 150 hs. El semáforo pasa a amarillo con 350 hs acumuladas y a rojo con 500 hs.</div>
+    </div>
+
+    <!-- GLOSARIO -->
+    <div class="section" id="sec-glosario">
+      <h1>Glosario</h1>
+      <table class="ref">
+        <thead><tr><th>Término</th><th>Definición</th></tr></thead>
+        <tbody>
+          <tr><td><strong>OT</strong></td><td>Orden de Trabajo. Documento que autoriza y registra una intervención de mantenimiento.</td></tr>
+          <tr><td><strong>Horómetro</strong></td><td>Instrumento que mide las horas de funcionamiento acumuladas de un equipo.</td></tr>
+          <tr><td><strong>Plan de mantenimiento</strong></td><td>Definición de un servicio preventivo: cuándo hacerlo (horas hito), con qué materiales y cuánta gente.</td></tr>
+          <tr><td><strong>EPP</strong></td><td>Equipos de Protección Personal. Elementos de seguridad que debe usar el mecánico (casco, guantes, etc.).</td></tr>
+          <tr><td><strong>Correctiva</strong></td><td>Intervención no planificada que surge de una falla o avería detectada.</td></tr>
+          <tr><td><strong>Preventiva</strong></td><td>Intervención planificada para prevenir fallas, basada en horas de uso del equipo.</td></tr>
+          <tr><td><strong>Semáforo</strong></td><td>Indicador visual (verde/amarillo/rojo) del estado de mantenimiento de un equipo.</td></tr>
+          <tr><td><strong>QR</strong></td><td>Código de respuesta rápida pegado en el equipo físico que permite identificarlo al escanearlo con una cámara.</td></tr>
+          <tr><td><strong>Pañol</strong></td><td>Depósito o almacén de herramientas y materiales de mantenimiento.</td></tr>
+          <tr><td><strong>Horas hito</strong></td><td>Cantidad de horas acumuladas a partir de la cual se debe realizar un servicio.</td></tr>
+          <tr><td><strong>Horas alerta</strong></td><td>Anticipación con la que el sistema avisa que se acerca el hito de servicio.</td></tr>
+          <tr><td><strong>Trazabilidad</strong></td><td>Registro completo y auditable de quién hizo qué y cuándo en el sistema.</td></tr>
+          <tr><td><strong>Código SAP</strong></td><td>Código de identificación del material en el sistema de gestión empresarial (ERP SAP).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function ir(id, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('act'));
+  document.getElementById('sec-'+id).classList.add('act');
+  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('act'));
+  if (el) el.classList.add('act');
+  else {
+    document.querySelectorAll('.sidebar a').forEach(a => {
+      if (a.getAttribute('onclick') && a.getAttribute('onclick').includes("'"+id+"'")) {
+        a.classList.add('act');
+      }
+    });
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+  return false;
+}
+</script>
+</body>
+</html>

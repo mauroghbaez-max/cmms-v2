@@ -6,70 +6,70 @@
 <title>MANTEN. — Equipo</title>
 <style>
 :root{
-  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
-  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;
-  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
   --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
-  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
-.topbar{background:var(--az2);border-bottom:0.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-size:20px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;}
-.btn-login{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:6px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
-.btn-login:hover{background:var(--cel1);}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+.topbar{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;}
+.logo{font-size:20px;font-weight:700;color:var(--v3);letter-spacing:0.12em;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.btn-login{background:var(--v1);border:none;color:#fff;padding:6px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;transition:background 0.15s;}
+.btn-login:hover{background:var(--v2);}
 .user-info{font-size:12px;color:var(--txt2);display:flex;align-items:center;gap:10px;}
-.btn-salir{background:transparent;border:0.5px solid var(--border);color:var(--txt3);padding:5px 12px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:11px;}
+.btn-salir{background:transparent;border:0.5px solid var(--border);color:var(--txt3);padding:5px 12px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:11px;transition:all 0.15s;}
+.btn-salir:hover{border-color:var(--v1);color:var(--txt1);}
 main{padding:20px;max-width:800px;margin:0 auto;}
-.equipo-header{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.equipo-header{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;backdrop-filter:blur(8px);}
 .equipo-nombre{font-size:22px;font-weight:700;color:var(--txt1);margin-bottom:4px;}
-.equipo-codigo{font-size:13px;color:var(--cel2);letter-spacing:0.08em;margin-bottom:12px;}
+.equipo-codigo{font-size:13px;color:var(--v3);letter-spacing:0.08em;margin-bottom:12px;}
 .datos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.dato{background:var(--az1);border-radius:var(--r-sm);padding:10px 14px;}
+.dato{background:rgba(14,11,26,0.6);border-radius:var(--r-sm);padding:10px 14px;border:0.5px solid var(--border);}
 .dato label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
 .dato span{font-size:13px;color:var(--txt1);}
-.horometro-grande{font-size:28px;font-weight:700;color:var(--cel2);}
-.section{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
-.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin-bottom:12px;}
+.horometro-grande{font-size:28px;font-weight:700;color:var(--v3);}
+.section{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;backdrop-filter:blur(8px);}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--v3);margin-bottom:12px;}
 .badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
 .badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
 .badge-warn{background:rgba(245,158,11,0.1);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
 .badge-danger{background:rgba(239,68,68,0.1);color:var(--danger);border:0.5px solid rgba(239,68,68,0.3);}
-.badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
-.obs-box{background:var(--az1);border-left:3px solid var(--cel1);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 14px;margin-bottom:8px;}
+.badge-rol{background:rgba(124,58,237,0.15);color:var(--v3);border:0.5px solid rgba(124,58,237,0.25);}
+.obs-box{background:rgba(14,11,26,0.6);border-left:3px solid var(--v1);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 14px;margin-bottom:8px;}
 .obs-rol{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
 .obs-texto{font-size:13px;color:var(--txt2);}
 .tbl{width:100%;border-collapse:collapse;font-size:12px;}
 .tbl th{text-align:left;font-size:10px;color:var(--txt3);padding:6px 10px;border-bottom:0.5px solid var(--border);}
 .tbl td{padding:8px 10px;border-bottom:0.5px solid var(--border);color:var(--txt1);}
 .tbl tr:last-child td{border-bottom:none;}
-.login-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
+.tbl tr:hover td{background:rgba(124,58,237,0.04);}
+.login-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .login-modal.show{display:flex;}
-.login-box{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:28px;width:100%;max-width:360px;}
-.login-box h3{color:var(--cel2);margin-bottom:18px;font-size:16px;}
+.login-box{background:var(--p2);border:0.5px solid var(--border);border-radius:var(--r);padding:28px;width:100%;max-width:360px;box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+.login-box h3{color:var(--v3);margin-bottom:18px;font-size:16px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;margin-bottom:5px;}
-.field input{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);padding:9px 12px;font-style:italic;font-family:inherit;font-size:13px;width:100%;}
-.field input:focus{border-color:var(--cel1);outline:none;}
+.field input{background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);padding:9px 12px;font-style:italic;font-family:inherit;font-size:13px;width:100%;outline:none;transition:border-color 0.15s;}
+.field input:focus{border-color:var(--v1);}
 .empty{color:var(--txt3);font-size:13px;text-align:center;padding:16px;}
 .loading{color:var(--txt3);font-size:13px;text-align:center;padding:24px;}
 .alert{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;}
 .alert-warn{background:rgba(245,158,11,0.08);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
-.ot-activa{background:rgba(37,99,168,0.15);border:0.5px solid var(--cel1);border-radius:var(--r-sm);padding:12px 16px;margin-bottom:8px;}
-
-/* ── QR Scanner ── */
-.qr-wrap{position:relative;width:100%;max-width:340px;margin:20px auto 0;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--cel1);background:#000;}
+.ot-activa{background:rgba(124,58,237,0.08);border:0.5px solid rgba(124,58,237,0.3);border-radius:var(--r-sm);padding:12px 16px;margin-bottom:8px;}
+.qr-wrap{position:relative;width:100%;max-width:340px;margin:20px auto 0;border-radius:var(--r);overflow:hidden;border:1.5px solid var(--v1);background:#000;}
 .qr-wrap video{display:block;width:100%;height:auto;}
 .qr-overlay{position:absolute;inset:0;pointer-events:none;}
-.qr-corner{position:absolute;width:28px;height:28px;border-color:var(--cel2);border-style:solid;}
+.qr-corner{position:absolute;width:28px;height:28px;border-color:var(--v3);border-style:solid;}
 .qr-corner.tl{top:12px;left:12px;border-width:3px 0 0 3px;}
 .qr-corner.tr{top:12px;right:12px;border-width:3px 3px 0 0;}
 .qr-corner.bl{bottom:12px;left:12px;border-width:0 0 3px 3px;}
 .qr-corner.br{bottom:12px;right:12px;border-width:0 3px 3px 0;}
-.qr-line{position:absolute;left:12px;right:12px;height:2px;background:var(--cel1);opacity:0.7;animation:scan 2s linear infinite;}
+.qr-line{position:absolute;left:12px;right:12px;height:2px;background:var(--v1);opacity:0.7;animation:scan 2s linear infinite;}
 @keyframes scan{0%{top:15%;}100%{top:85%;}}
-.btn-scan{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:11px 28px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:14px;font-weight:700;margin-top:24px;letter-spacing:0.04em;}
-.btn-scan:hover{background:var(--cel1);}
+.btn-scan{background:var(--v1);border:none;color:#fff;padding:11px 28px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:14px;font-weight:700;margin-top:24px;letter-spacing:0.04em;box-shadow:0 4px 16px rgba(124,58,237,0.3);transition:background 0.15s;}
+.btn-scan:hover{background:var(--v2);}
 .btn-cancelar-scan{background:transparent;border:0.5px solid var(--border);color:var(--txt3);padding:8px 20px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;margin-top:10px;}
 .qr-status{font-size:12px;color:var(--txt3);margin-top:10px;min-height:18px;}
 </style>
@@ -87,7 +87,6 @@ main{padding:20px;max-width:800px;margin:0 auto;}
   <div class="loading">Cargando información del equipo...</div>
 </main>
 
-<!-- Modal login -->
 <div class="login-modal" id="login-modal">
   <div class="login-box">
     <h3>Ingresar al sistema</h3>
@@ -105,18 +104,11 @@ main{padding:20px;max-width:800px;margin:0 auto;}
 <script>
 const API = 'https://cmms-v2-production.up.railway.app/api/v1';
 const params = new URLSearchParams(window.location.search);
-
-// ✅ FIX: solo leer ?codigo= de la URL.
-// Antes: `|| window.location.pathname.split('/').pop()` devolvía
-// "equipo.html" cuando no había parámetro → el if(!codigo) nunca se
-// ejecutaba → se pedía /api/v1/equipo/equipo.html/detalle → 404 +
-// renderizado con undefined.
 const codigo = params.get('codigo');
 
 let token = localStorage.getItem('manten_token');
 let user = JSON.parse(localStorage.getItem('manten_user') || 'null');
 
-// Actualizar nav
 function actualizarNav() {
   const nav = document.getElementById('nav-user');
   if (user) {
@@ -128,12 +120,11 @@ function actualizarNav() {
 
 async function cargar() {
   if (!codigo) {
-    // Sin código QR en la URL → decidir por rol
     const esInspector = user && (user.rol === 'inspector' || user.rol === 'gerencia');
     document.getElementById('main').innerHTML = esInspector
       ? `<div style="text-align:center;padding:40px 20px 20px;">
           <div style="font-size:52px;margin-bottom:16px;">📷</div>
-          <div style="font-size:20px;font-weight:700;color:var(--cel2);margin-bottom:8px;">
+          <div style="font-size:20px;font-weight:700;color:var(--v3);margin-bottom:8px;">
             Bienvenido, ${user.nombre_completo}
           </div>
           <div style="font-size:14px;color:var(--txt2);max-width:280px;margin:0 auto 0;line-height:1.6;">
@@ -151,7 +142,6 @@ async function cargar() {
   }
 
   if (token && user) {
-    // Vista autorizada
     try {
       const r = await fetch(API + '/equipo/' + encodeURIComponent(codigo) + '/detalle', {
         headers: { 'Authorization': 'Bearer ' + token }
@@ -159,7 +149,6 @@ async function cargar() {
       if (r.status === 401) {
         token = null; user = null; localStorage.clear(); cargar(); return;
       }
-      // ✅ FIX secundario: verificar que la respuesta sea OK antes de renderizar
       if (!r.ok) {
         document.getElementById('main').innerHTML = '<div class="empty">Equipo no encontrado.</div>';
         return;
@@ -170,7 +159,6 @@ async function cargar() {
       renderPublico(await cargarPublico());
     }
   } else {
-    // Vista pública
     const data = await cargarPublico();
     if (data) renderPublico(data);
   }
@@ -211,8 +199,6 @@ function renderPublico(d) {
 
 function renderAutorizado(d) {
   document.title = 'MANTEN. — ' + d.nombre;
-
-  // Semáforo próximo servicio
   let semaforo = '';
   if (d.proximo_servicio) {
     const hs = d.proximo_servicio.hs_faltantes;
@@ -220,8 +206,6 @@ function renderAutorizado(d) {
     else if (hs <= d.proximo_servicio.horas_alerta) semaforo = '<span class="badge badge-warn">' + hs + ' hs para servicio</span>';
     else semaforo = '<span class="badge badge-ok">' + hs + ' hs para servicio</span>';
   }
-
-  // Observaciones por rol
   const obs = [
     { rol: 'Relevador', texto: d.obs_relevador },
     { rol: 'Horometrista', texto: d.obs_horometrista },
@@ -250,7 +234,7 @@ function renderAutorizado(d) {
     <div class="section">
       <div class="section-title">OT activa</div>
       <div class="ot-activa">
-        <div style="font-weight:700;color:var(--cel2);">${d.ot_activa.numero}</div>
+        <div style="font-weight:700;color:var(--v3);">${d.ot_activa.numero}</div>
         <div style="font-size:12px;color:var(--txt2);margin-top:4px;">Plan: ${d.ot_activa.plan || '—'} · Estado: ${d.ot_activa.estado}</div>
         <div style="font-size:12px;color:var(--txt2);">Mecánico: ${d.ot_activa.mecanico || '—'} · Apertura: ${d.ot_activa.fecha_apertura}</div>
       </div>
@@ -298,7 +282,7 @@ function renderAutorizado(d) {
         <thead><tr><th>OT</th><th>Plan</th><th>Hs apertura</th><th>Hs cierre</th><th>Mecánico</th><th>Fecha cierre</th></tr></thead>
         <tbody>
           ${d.historial.map(h => `<tr>
-            <td style="color:var(--cel2);">${h.numero}</td>
+            <td style="color:var(--v3);">${h.numero}</td>
             <td>${h.plan || '—'}</td>
             <td>${h.horometro_apertura || '—'}</td>
             <td>${h.horometro_cierre || '—'}</td>
@@ -311,7 +295,6 @@ function renderAutorizado(d) {
   `;
 }
 
-// LOGIN
 function abrirLogin() { document.getElementById('login-modal').classList.add('show'); }
 function cerrarLogin() { document.getElementById('login-modal').classList.remove('show'); }
 
@@ -347,14 +330,12 @@ function salir() {
   cargar();
 }
 
-// ── QR Scanner (html5-qrcode) ────────────────────────────────────────────────
 let html5QrScanner = null;
 
 function iniciarScanner() {
   const area = document.getElementById('qr-scanner-area');
   if (!area) return;
   document.getElementById('btn-iniciar-scan').style.display = 'none';
-
   area.innerHTML = `
     <div class="qr-wrap" style="position:relative;max-width:340px;margin:20px auto 0;">
       <div id="qr-reader"></div>
@@ -367,14 +348,11 @@ function iniciarScanner() {
     <div class="qr-status" id="qr-status">Apuntá la cámara al código QR…</div>
     <div><button class="btn-cancelar-scan" onclick="detenerScanner()">Cancelar</button></div>
   `;
-
   html5QrScanner = new Html5Qrcode('qr-reader');
-
   html5QrScanner.start(
     { facingMode: 'environment' },
     { fps: 10, qrbox: { width: 240, height: 240 } },
     (decodedText) => {
-      // QR detectado
       detenerScanner();
       let codigoDetectado = decodedText.trim();
       try {
@@ -382,11 +360,9 @@ function iniciarScanner() {
         const c = url.searchParams.get('codigo');
         if (c) codigoDetectado = c;
       } catch(e) { /* valor crudo */ }
-      // DEBUG TEMPORAL — borrar después de confirmar
-      alert('QR leído: "' + decodedText + '"\nCódigo extraído: "' + codigoDetectado + '"');
       window.location.href = 'equipo.html?codigo=' + encodeURIComponent(codigoDetectado);
     },
-    () => { /* frame sin QR, ignorar */ }
+    () => {}
   ).catch(err => {
     area.innerHTML = `<div class="qr-status" style="color:var(--danger);margin-top:16px;">
       No se pudo acceder a la cámara.<br><small>${err}</small>
@@ -405,7 +381,6 @@ function detenerScanner() {
   const btn = document.getElementById('btn-iniciar-scan');
   if (btn) btn.style.display = '';
 }
-// ────────────────────────────────────────────────────────────────────────────
 
 actualizarNav();
 setTimeout(cargar, 50);

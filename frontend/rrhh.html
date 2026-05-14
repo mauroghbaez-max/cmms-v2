@@ -6,36 +6,40 @@
 <title>RRHH — MANTEN.</title>
 <style>
 :root{
-  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
-  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--cel4:#e6f1fb;
-  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
   --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
-  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
-.topbar{background:var(--az2);border-bottom:0.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.logo{font-size:20px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;}
-.role-pill{background:rgba(37,99,168,0.25);color:var(--cel2);font-size:11px;padding:3px 12px;border-radius:20px;border:0.5px solid rgba(91,163,232,0.3);}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+.topbar{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);}
+.logo{font-size:20px;font-weight:700;color:var(--v3);letter-spacing:0.12em;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.role-pill{background:rgba(124,58,237,0.2);color:var(--v3);font-size:11px;padding:3px 12px;border-radius:20px;border:0.5px solid rgba(124,58,237,0.35);}
 .user-name{color:var(--txt2);font-size:13px;}
 .nav{display:flex;gap:4px;}
-.nav-btn{background:none;border:none;color:#d8e8f5;font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
-.nav-btn.act{background:rgba(37,99,168,0.25);color:#f0f6ff;border:0.5px solid rgba(91,163,232,0.35);font-weight:700;}
-.btn-salir{background:none;border:0.5px solid var(--border);color:#d8e8f5;font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
+.nav-btn{background:none;border:none;color:var(--txt2);font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.nav-btn:hover{background:rgba(124,58,237,0.1);color:var(--txt1);}
+.nav-btn.act{background:rgba(124,58,237,0.2);color:var(--v3);border:0.5px solid rgba(124,58,237,0.35);font-weight:700;}
+.btn-salir{background:none;border:0.5px solid var(--border);color:var(--txt2);font-size:13px;padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.btn-salir:hover{border-color:var(--v1);color:var(--txt1);}
+.nav-manual{background:none;border:0.5px solid var(--border);color:var(--txt2);font-size:12px;padding:5px 12px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.nav-manual:hover{border-color:var(--v1);color:var(--txt1);}
 .main{padding:20px 24px;max-width:1200px;margin:0 auto;}
 .panel{display:none;}.panel.act{display:block;}
-.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin:18px 0 10px;}
-.card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--v3);margin:18px 0 10px;}
+.card{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px;backdrop-filter:blur(8px);}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
 .fg{display:flex;flex-direction:column;gap:5px;}
 .fg label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;}
-.fg input,.fg select,.fg textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cel1);}
-.fg select option{background:var(--az2);}
-.btn{font-size:12px;padding:8px 16px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(37,99,168,0.15);color:var(--cel3);cursor:pointer;font-style:italic;font-family:inherit;}
-.btn:hover{border-color:var(--cel1);color:var(--cel2);}
-.btn-primary{background:var(--az4);border-color:var(--cel1);color:var(--txt1);}
-.btn-primary:hover{background:var(--cel1);}
+.fg input,.fg select,.fg textarea{background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;transition:border-color 0.15s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--v1);box-shadow:0 0 0 2px rgba(124,58,237,0.1);}
+.fg select option{background:var(--p2);}
+.btn{font-size:12px;padding:8px 16px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(124,58,237,0.1);color:var(--v3);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.btn:hover{border-color:var(--v1);background:rgba(124,58,237,0.18);}
+.btn-primary{background:var(--v1);border-color:var(--v2);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.btn-primary:hover{background:var(--v2);}
 .btn-ok{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--ok);}
 .btn-ok:hover{background:rgba(16,185,129,0.2);}
 .btn-danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--danger);}
@@ -45,20 +49,20 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .tbl th{text-align:left;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--txt3);padding:8px 12px;border-bottom:0.5px solid var(--border);}
 .tbl td{padding:9px 12px;border-bottom:0.5px solid var(--border);color:var(--txt1);vertical-align:middle;}
 .tbl tr:last-child td{border-bottom:none;}
-.tbl tr:hover td{background:rgba(37,99,168,0.08);}
+.tbl tr:hover td{background:rgba(124,58,237,0.05);}
 .badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
 .badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
 .badge-off{background:rgba(239,68,68,0.1);color:var(--danger);border:0.5px solid rgba(239,68,68,0.3);}
 .badge-warn{background:rgba(245,158,11,0.1);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
-.badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
+.badge-rol{background:rgba(124,58,237,0.15);color:var(--v3);border:0.5px solid rgba(124,58,237,0.25);}
 .badge-urgente{background:rgba(239,68,68,0.2);color:#ff6b6b;border:0.5px solid rgba(239,68,68,0.4);font-weight:700;}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-bg.open{display:flex;}
-.modal{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--cel2);}
+.modal{background:var(--p2);border:0.5px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:18px;color:var(--v3);}
 .divider{border:none;border-top:0.5px solid var(--border);margin:14px 0;}
 .epp-row{display:grid;grid-template-columns:1fr 70px 60px auto;gap:8px;align-items:center;margin-bottom:8px;}
-.doc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;background:rgba(37,99,168,0.08);border-radius:var(--r-sm);padding:8px 12px;}
+.doc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;background:rgba(124,58,237,0.06);border-radius:var(--r-sm);padding:8px 12px;border:0.5px solid var(--border);}
 .doc-name{flex:1;font-size:12px;color:var(--txt2);}
 .empty{color:var(--txt3);font-size:13px;padding:24px;text-align:center;}
 .loading{color:var(--txt3);font-size:13px;padding:16px;text-align:center;}
@@ -68,8 +72,8 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 .alert-box{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;}
 .alert-ok{background:rgba(16,185,129,0.1);border:0.5px solid rgba(16,185,129,0.3);color:var(--ok);}
 .alert-warn{background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
-.upload-zone{border:0.5px dashed rgba(91,163,232,0.3);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;margin-bottom:10px;}
-.upload-zone:hover{border-color:var(--cel1);background:rgba(37,99,168,0.08);}
+.upload-zone{border:0.5px dashed rgba(124,58,237,0.3);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;margin-bottom:10px;transition:all 0.15s;}
+.upload-zone:hover{border-color:var(--v1);background:rgba(124,58,237,0.05);}
 </style>
 </head>
 <body>
@@ -84,12 +88,14 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     <button class="nav-btn act" onclick="setPanel('pendientes',this)">Pendientes</button>
     <button class="nav-btn" onclick="setPanel('historial',this)">Historial</button>
   </div>
-  <button class="btn-salir" onclick="logout()">Salir</button>
+  <div class="row" style="gap:8px;">
+    <a href="manual.html" class="nav-manual" target="_blank">📖 Manual</a>
+    <button class="btn-salir" onclick="logout()">Salir</button>
+  </div>
 </div>
 
 <div class="main">
 
-<!-- ═══ PENDIENTES ═══ -->
 <div class="panel act" id="panel-pendientes">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
     <div class="section-title" style="margin:0;">OTs pendientes de aprobación</div>
@@ -106,17 +112,16 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
 </div>
 
-<!-- ═══ HISTORIAL ═══ -->
 <div class="panel" id="panel-historial">
   <div class="row" style="justify-content:space-between;margin-bottom:14px;">
-    <div class="section-title" style="margin:0;">OTs aprobadas</div>
+    <div class="section-title" style="margin:0;">OTs con RRHH aprobado</div>
     <button class="btn" onclick="cargarHistorial()">↺ Actualizar</button>
   </div>
   <div style="overflow-x:auto;">
     <table class="tbl">
       <thead><tr>
         <th>Número</th><th>Tipo</th><th>Equipo</th><th>Mecánico</th>
-        <th>Personal</th><th>Fecha aprobación</th><th></th>
+        <th>Personal</th><th>Fecha apertura</th><th></th>
       </tr></thead>
       <tbody id="tbody-historial"><tr><td colspan="7" class="loading">Cargando...</td></tr></tbody>
     </table>
@@ -125,17 +130,12 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
 
 </div>
 
-<!-- ═══ MODAL CARGAR DATOS ═══ -->
 <div class="modal-bg" id="modal-rrhh">
   <div class="modal">
     <div class="modal-title" id="modal-rrhh-titulo">Cargar datos RRHH</div>
     <input type="hidden" id="rrhh-ot-id">
-
-    <!-- Info de la OT -->
     <div class="info-grid" id="rrhh-info-ot"></div>
     <hr class="divider">
-
-    <!-- Personal -->
     <div class="section-title" style="margin-top:0;">Personal</div>
     <div class="form-grid">
       <div class="fg">
@@ -151,19 +151,13 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
       <label>Cantidad total de personal</label>
       <input type="number" id="rrhh-personal" value="1" min="1" style="width:100px;">
     </div>
-
     <hr class="divider">
-
-    <!-- EPP -->
     <div class="row" style="justify-content:space-between;margin-bottom:10px;">
       <div class="section-title" style="margin:0;">EPP requeridos</div>
       <button class="btn btn-sm" onclick="agregarEPP()">+ EPP</button>
     </div>
     <div id="contenedor-epp"></div>
-
     <hr class="divider">
-
-    <!-- Documentación -->
     <div class="section-title">Documentación para ingreso al predio</div>
     <div class="upload-zone" onclick="document.getElementById('doc-input').click()">
       <div style="font-size:13px;color:var(--txt2);">Subir PDF</div>
@@ -171,15 +165,11 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
     <input type="file" id="doc-input" accept=".pdf" multiple style="display:none;" onchange="cargarDocs(this)">
     <div id="contenedor-docs"></div>
-
     <hr class="divider">
-
-    <!-- Observaciones -->
     <div class="fg" style="margin-bottom:16px;">
       <label>Observaciones</label>
       <textarea id="rrhh-obs" rows="2" placeholder="Notas adicionales..."></textarea>
     </div>
-
     <div class="row">
       <button class="btn btn-primary" onclick="guardarRRHH(false)">Guardar</button>
       <button class="btn btn-ok" onclick="guardarRRHH(true)">Guardar y dar visto bueno</button>
@@ -227,8 +217,6 @@ function setPanel(nombre, el) {
   if (nombre==='historial') cargarHistorial();
 }
 
-// ─── LISTADOS ──────────────────────────────────────────────────────
-
 async function cargarOTs() {
   document.getElementById('tbody-pendientes').innerHTML = '<tr><td colspan="8" class="loading">Cargando...</td></tr>';
   try {
@@ -242,10 +230,10 @@ async function cargarOTs() {
     tbody.innerHTML = pendientes.map(o => `
       <tr>
         <td>${o.urgente ? '<span class="badge badge-urgente">URGENTE</span>' : '<span style="color:var(--txt3)">Normal</span>'}</td>
-        <td style="font-weight:700;color:var(--cel2);">${o.numero}</td>
+        <td style="font-weight:700;color:var(--v3);">${o.numero}</td>
         <td><span class="badge ${o.tipo==='correctiva'?'badge-warn':'badge-rol'}">${o.tipo}</span></td>
         <td>${o.equipo_nombre}</td>
-        <td style="color:var(--txt3);">${o.plan_nombre}</td>
+        <td style="color:var(--txt3);">${o.plan_nombre||'—'}</td>
         <td style="color:var(--txt3);">${o.fecha_apertura}</td>
         <td>${o.mecanico_nombre
           ? '<span class="badge badge-warn">Datos cargados</span>'
@@ -261,7 +249,8 @@ async function cargarOTs() {
 async function cargarHistorial() {
   document.getElementById('tbody-historial').innerHTML = '<tr><td colspan="7" class="loading">Cargando...</td></tr>';
   try {
-    const data = await api('/rrhh/ots?estado=autorizada') || [];
+    // FIX: load all OTs, not just 'autorizada' — approved OTs can be in any state
+    const data = await api('/rrhh/ots') || [];
     const aprobadas = data.filter(o => o.rrhh_aprobado);
     const tbody = document.getElementById('tbody-historial');
     if (!aprobadas.length) {
@@ -270,7 +259,7 @@ async function cargarHistorial() {
     }
     tbody.innerHTML = aprobadas.map(o => `
       <tr>
-        <td style="font-weight:700;color:var(--cel2);">${o.numero}</td>
+        <td style="font-weight:700;color:var(--v3);">${o.numero}</td>
         <td><span class="badge ${o.tipo==='correctiva'?'badge-warn':'badge-rol'}">${o.tipo}</span></td>
         <td>${o.equipo_nombre}</td>
         <td>${o.mecanico_nombre || '—'}</td>
@@ -283,8 +272,6 @@ async function cargarHistorial() {
     document.getElementById('tbody-historial').innerHTML = '<tr><td colspan="7" class="empty">Error: '+e.message+'</td></tr>';
   }
 }
-
-// ─── MODAL ─────────────────────────────────────────────────────────
 
 async function abrirModal(otId) {
   document.getElementById('rrhh-ot-id').value = otId;
@@ -303,9 +290,9 @@ async function abrirModal(otId) {
       <div class="info-item"><span>Equipo</span><span style="font-weight:700;">${ot.equipo_nombre} (${ot.codigo_interno})</span></div>
       <div class="info-item"><span>Ubicación</span><span>${ot.ubicacion||'—'}</span></div>
       <div class="info-item"><span>Tipo</span><span><span class="badge ${ot.tipo==='correctiva'?'badge-warn':'badge-rol'}">${ot.tipo}</span>${ot.urgente?'<span class="badge badge-urgente" style="margin-left:4px;">URGENTE</span>':''}</span></div>
-      <div class="info-item"><span>Plan</span><span>${ot.plan_nombre}</span></div>
+      <div class="info-item"><span>Plan</span><span>${ot.plan_nombre||'—'}</span></div>
       <div class="info-item"><span>Vehículo traslado</span><span>${ot.vehiculo_traslado||'—'}</span></div>
-      <div class="info-item"><span>Personal sugerido</span><span>${ot.plan_personal}</span></div>
+      <div class="info-item"><span>Personal sugerido</span><span>${ot.plan_personal||'—'}</span></div>
     `;
 
     document.getElementById('rrhh-mecanico').value = ot.mecanico_nombre || '';
@@ -313,25 +300,18 @@ async function abrirModal(otId) {
     document.getElementById('rrhh-personal').value = ot.cantidad_personal || ot.plan_personal || 1;
     document.getElementById('rrhh-obs').value = ot.observaciones || '';
 
-    // Cargar EPP existentes
     (ot.epp_items || []).forEach(epp => agregarEPP(epp));
-
-    // Cargar docs existentes
     docsAdjuntos = ot.documentos_rrhh || [];
     renderDocs();
 
-    // Si ya está aprobado, mostrar aviso
     if (ot.rrhh_aprobado) {
       document.getElementById('rrhh-info-ot').innerHTML +=
         '<div class="alert-box alert-ok" style="grid-column:1/-1;">✓ RRHH aprobó esta OT el ' + (ot.fecha_aprobacion_rrhh||'') + '</div>';
     }
-
   } catch(e) {
     document.getElementById('rrhh-info-ot').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
   }
 }
-
-// ─── EPP ───────────────────────────────────────────────────────────
 
 function agregarEPP(data={}) {
   eppContador++;
@@ -341,10 +321,10 @@ function agregarEPP(data={}) {
   div.id = id;
   div.innerHTML = `
     <input type="text" placeholder="Descripción del EPP *" class="epp-desc" value="${data.descripcion||''}"
-      style="background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 10px;font-style:italic;font-family:inherit;">
+      style="background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 10px;font-style:italic;font-family:inherit;">
     <input type="number" placeholder="Cant." value="${data.cantidad||1}" class="epp-cant" min="1"
-      style="background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 10px;text-align:right;font-style:italic;font-family:inherit;">
-    <select class="epp-un" style="background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:12px;padding:8px;font-style:italic;font-family:inherit;">
+      style="background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:8px 10px;text-align:right;font-style:italic;font-family:inherit;">
+    <select class="epp-un" style="background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:12px;padding:8px;font-style:italic;font-family:inherit;">
       ${['UN','PAR','JGO','KIT'].map(u=>`<option ${u===(data.unidad||'UN')?'selected':''}>${u}</option>`).join('')}
     </select>
     <button class="btn btn-sm btn-danger" onclick="document.getElementById('${id}').remove()">✕</button>
@@ -365,19 +345,13 @@ function getEPP() {
   return items;
 }
 
-// ─── DOCS ──────────────────────────────────────────────────────────
-
 function cargarDocs(input) {
   const files = Array.from(input.files);
   files.forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
       const parts = e.target.result.split(',');
-      docsAdjuntos.push({
-        nombre: file.name,
-        mime: file.type,
-        data: parts[1],
-      });
+      docsAdjuntos.push({ nombre: file.name, mime: file.type, data: parts[1] });
       renderDocs();
     };
     reader.readAsDataURL(file);
@@ -397,12 +371,7 @@ function renderDocs() {
   `).join('');
 }
 
-function eliminarDoc(i) {
-  docsAdjuntos.splice(i, 1);
-  renderDocs();
-}
-
-// ─── GUARDAR ───────────────────────────────────────────────────────
+function eliminarDoc(i) { docsAdjuntos.splice(i, 1); renderDocs(); }
 
 async function guardarRRHH(aprobar) {
   const otId = document.getElementById('rrhh-ot-id').value;
@@ -410,17 +379,16 @@ async function guardarRRHH(aprobar) {
   if (!mecanico) { alert('El mecánico responsable es obligatorio'); return; }
 
   const payload = {
-    mecanico_nombre:  mecanico,
-    auxiliar_nombre:  document.getElementById('rrhh-auxiliar').value.trim(),
+    mecanico_nombre: mecanico,
+    auxiliar_nombre: document.getElementById('rrhh-auxiliar').value.trim(),
     cantidad_personal: parseInt(document.getElementById('rrhh-personal').value) || 1,
-    epp_items:        getEPP(),
-    documentos_rrhh:  docsAdjuntos,
-    observaciones:    document.getElementById('rrhh-obs').value.trim(),
+    epp_items: getEPP(),
+    documentos_rrhh: docsAdjuntos,
+    observaciones: document.getElementById('rrhh-obs').value.trim(),
   };
 
   try {
     await api('/rrhh/ots/'+otId+'/cargar', {method:'PUT', body:JSON.stringify(payload)});
-
     if (aprobar) {
       if (!confirm('¿Confirmar visto bueno? Esto habilitará al Planificador para imprimir la OT y liberará los EPP al Pañol.')) return;
       await api('/rrhh/ots/'+otId+'/aprobar', {method:'POST', body:JSON.stringify({})});
@@ -428,7 +396,6 @@ async function guardarRRHH(aprobar) {
     } else {
       alert('Datos guardados.');
     }
-
     cerrarModal();
     cargarOTs();
   } catch(e) {
@@ -436,15 +403,9 @@ async function guardarRRHH(aprobar) {
   }
 }
 
-function cerrarModal() {
-  document.getElementById('modal-rrhh').classList.remove('open');
-}
+function cerrarModal() { document.getElementById('modal-rrhh').classList.remove('open'); }
+window.onclick = e => { if (e.target === document.getElementById('modal-rrhh')) cerrarModal(); };
 
-window.onclick = e => {
-  if (e.target === document.getElementById('modal-rrhh')) cerrarModal();
-};
-
-// Init
 cargarOTs();
 </script>
 </body>

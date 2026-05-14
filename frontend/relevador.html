@@ -5,51 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANTEN. — Relevador</title>
 <style>
-:root{--az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;--cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;--ok:#10b981;--warn:#f59e0b;--danger:#ef4444;--r:14px;--r-sm:10px;}
+:root{
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
+  --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
-nav{background:var(--az2);border-bottom:0.5px solid rgba(55,138,221,0.2);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;}
-.logo{font-size:22px;font-weight:700;color:var(--cel2);letter-spacing:0.15em;margin-right:8px;}
-.rol-badge{background:var(--az3);color:var(--cel3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--cel1);}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+nav{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;backdrop-filter:blur(16px);}
+.logo{font-size:22px;font-weight:700;color:var(--v3);letter-spacing:0.15em;margin-right:8px;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.rol-badge{background:rgba(124,58,237,0.2);color:var(--v3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(124,58,237,0.35);}
 .nav-name{color:var(--txt2);font-size:13px;}
-.btn-nav{background:transparent;border:0.5px solid rgba(55,138,221,0.3);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
-.btn-nav:hover{background:var(--az3);color:var(--txt1);}
+.btn-nav{background:transparent;border:0.5px solid var(--border);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s;}
+.btn-nav:hover{background:rgba(124,58,237,0.1);color:var(--txt1);border-color:var(--v1);}
 .spacer{flex:1;}
 main{padding:24px;max-width:1200px;margin:0 auto;}
 h2{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
 .toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-.btn{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;font-weight:700;}
-.btn:hover{background:var(--cel1);}
-.btn-ok{background:#065f46;border-color:var(--ok);}
-.btn-ok:hover{background:var(--ok);}
-input,select,textarea{background:var(--az1);border:0.5px solid rgba(55,138,221,0.2);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;font-style:italic;font-family:inherit;outline:none;width:100%;}
-input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
+.btn{background:var(--v1);border:0.5px solid var(--v2);color:#fff;padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;font-weight:700;transition:all 0.15s;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.btn:hover{background:var(--v2);}
+.btn-ok{background:rgba(16,185,129,0.15);border:0.5px solid rgba(16,185,129,0.4);color:var(--ok);box-shadow:none;}
+.btn-ok:hover{background:rgba(16,185,129,0.25);}
+input,select,textarea{background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:13px;padding:9px 12px;font-style:italic;font-family:inherit;outline:none;width:100%;transition:border-color 0.15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--v1);box-shadow:0 0 0 2px rgba(124,58,237,0.1);}
 .search{max-width:300px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
-.card{background:var(--az2);border:0.5px solid rgba(55,138,221,0.15);border-radius:var(--r);padding:18px;transition:border-color 0.2s;}
-.card:hover{border-color:var(--cel1);}
+.card{
+  background:rgba(23,15,46,0.8);
+  border:0.5px solid var(--border);
+  border-radius:var(--r);padding:18px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  backdrop-filter:blur(8px);
+}
+.card:hover{border-color:rgba(124,58,237,0.4);box-shadow:0 0 20px rgba(124,58,237,0.1);}
 .card-title{font-size:16px;font-weight:700;color:var(--txt1);margin-bottom:4px;}
-.card-code{font-size:11px;color:var(--cel2);letter-spacing:0.08em;margin-bottom:8px;}
+.card-code{font-size:11px;color:var(--v3);letter-spacing:0.08em;margin-bottom:8px;}
 .card-row{font-size:12px;color:var(--txt2);margin-bottom:3px;}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
-.badge-ok{background:#065f46;color:#6ee7b7;}
-.badge-off{background:#7f1d1d;color:#fca5a5;}
-.card-hs{font-size:20px;font-weight:700;color:var(--cel2);margin-top:8px;}
+.badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
+.badge-off{background:rgba(239,68,68,0.1);color:var(--danger);border:0.5px solid rgba(239,68,68,0.3);}
+.card-hs{font-size:20px;font-weight:700;color:var(--v3);margin-top:8px;}
 .card-actions{display:flex;gap:8px;margin-top:12px;}
-.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid rgba(55,138,221,0.3);background:var(--az3);color:var(--txt1);cursor:pointer;font-style:italic;font-family:inherit;}
-.btn-sm:hover{background:var(--az4);}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.1);color:var(--v3);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.btn-sm:hover{background:rgba(124,58,237,0.2);border-color:var(--v1);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .overlay.show{display:flex;}
-.modal{background:var(--az2);border:0.5px solid rgba(55,138,221,0.3);border-radius:var(--r);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
-.modal h3{font-size:16px;color:var(--cel2);margin-bottom:20px;}
+.modal{background:var(--p2);border:0.5px solid var(--border);border-radius:var(--r);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+.modal h3{font-size:16px;color:var(--v3);margin-bottom:20px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
 .empty{color:var(--txt3);font-size:13px;text-align:center;padding:40px;}
 .foto-preview{width:100%;max-height:150px;object-fit:cover;border-radius:var(--r-sm);margin-top:8px;display:none;}
-.btn-gps{background:var(--az3);border:0.5px solid var(--cel1);color:var(--cel2);padding:7px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;width:100%;margin-bottom:8px;}
-.btn-gps:hover{background:var(--az4);}
+.btn-gps{background:rgba(124,58,237,0.1);border:0.5px solid var(--v1);color:var(--v3);padding:7px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;width:100%;margin-bottom:8px;transition:all 0.15s;}
+.btn-gps:hover{background:rgba(124,58,237,0.2);}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
@@ -59,6 +71,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cel1);}
   <span class="rol-badge">Relevador</span>
   <span class="nav-name" id="nav-name"></span>
   <span class="spacer"></span>
+  <a href="manual.html" class="btn-nav" target="_blank">📖 Manual</a>
   <button class="btn-nav" onclick="salir()">Salir</button>
 </nav>
 <main>
@@ -197,9 +210,7 @@ function editar(id) {
   document.getElementById('overlay').classList.add('show');
 }
 
-function cerrarModal() {
-  document.getElementById('overlay').classList.remove('show');
-}
+function cerrarModal() { document.getElementById('overlay').classList.remove('show'); }
 
 function previewFoto(input) {
   const file = input.files[0];
@@ -287,14 +298,14 @@ function verQR(id, codigo, nombre) {
   if (!overlay) {
     overlay = document.createElement('div');
     overlay.id = 'overlay-qr';
-    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;';
-    overlay.innerHTML = `<div style="background:#0d2240;border:0.5px solid rgba(55,138,221,0.3);border-radius:14px;padding:28px;text-align:center;min-width:260px;">
-      <div style="font-size:13px;color:#5ba3e8;margin-bottom:4px;font-style:italic;" id="qr-nombre"></div>
-      <div style="font-size:11px;color:#5a7fa8;margin-bottom:16px;font-style:italic;" id="qr-codigo"></div>
+    overlay.style.cssText = 'display:flex;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+    overlay.innerHTML = `<div style="background:#170f2e;border:0.5px solid rgba(124,58,237,0.3);border-radius:14px;padding:28px;text-align:center;min-width:260px;box-shadow:0 32px 64px rgba(0,0,0,0.5);">
+      <div style="font-size:13px;color:#a78bfa;margin-bottom:4px;font-style:italic;" id="qr-nombre"></div>
+      <div style="font-size:11px;color:#7c6faa;margin-bottom:16px;font-style:italic;" id="qr-codigo"></div>
       <div id="qr-canvas" style="display:inline-block;background:white;padding:12px;border-radius:8px;"></div>
-      <div style="margin-top:16px;">
-        <button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#1a3a6b;border:0.5px solid rgba(55,138,221,0.3);color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
-        <button onclick="imprimirQR()" style="background:#2563a8;border:0.5px solid #378add;color:#e8f0fc;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;margin-left:8px;">Imprimir</button>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+        <button onclick="document.getElementById('overlay-qr').style.display='none'" style="background:#2a1b52;border:0.5px solid rgba(124,58,237,0.3);color:#f0ebff;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Cerrar</button>
+        <button onclick="imprimirQR()" style="background:#7c3aed;border:0.5px solid #6d28d9;color:#fff;padding:7px 20px;border-radius:10px;cursor:pointer;font-style:italic;font-family:inherit;">Imprimir</button>
       </div>
     </div>`;
     document.body.appendChild(overlay);
@@ -304,7 +315,6 @@ function verQR(id, codigo, nombre) {
   document.getElementById('qr-codigo').textContent = codigo;
   const canvas = document.getElementById('qr-canvas');
   canvas.innerHTML = '';
-  // Usar QR guardado en DB si existe, sino generar
   if (equipo && equipo.qr_code) {
     const img = document.createElement('img');
     img.src = equipo.qr_code;
@@ -330,6 +340,10 @@ function imprimirQR() {
   </body></html>`);
   w.document.close();
 }
+
+window.onclick = e => {
+  if (e.target === document.getElementById('overlay')) cerrarModal();
+};
 </script>
 </body>
 </html>

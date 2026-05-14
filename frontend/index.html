@@ -5,26 +5,62 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MANTEN. v2.0</title>
 <style>
-:root {
-  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
-  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;--cel4:#e6f1fb;
-  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+:root{
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
   --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
-  --r:14px;--r-sm:10px;
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+body{
+  background:var(--p1);
+  background-image:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(124,58,237,0.12) 0%,transparent 60%);
+  color:var(--txt1);
+  font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;
+  font-style:italic;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+}
 .login-wrap{width:100%;max-width:400px;padding:20px;}
-.logo{font-size:42px;font-weight:700;color:var(--cel2);letter-spacing:0.15em;text-align:center;margin-bottom:6px;}
+.logo{font-size:48px;font-weight:700;color:var(--v3);letter-spacing:0.15em;text-align:center;margin-bottom:4px;text-shadow:0 0 40px rgba(124,58,237,0.4);}
 .tagline{font-size:13px;color:var(--txt3);text-align:center;margin-bottom:40px;letter-spacing:0.05em;}
-.card{background:var(--az2);border:0.5px solid rgba(55,138,221,0.2);border-radius:var(--r);padding:32px;}
+.card{
+  background:rgba(23,15,46,0.85);
+  border:0.5px solid var(--border);
+  border-radius:var(--r);
+  padding:32px;
+  backdrop-filter:blur(16px);
+  box-shadow:0 24px 48px rgba(0,0,0,0.4),0 0 0 0.5px rgba(124,58,237,0.1);
+}
 .field{margin-bottom:18px;}
 .field label{display:block;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
-.field input{width:100%;background:var(--az1);border:0.5px solid rgba(55,138,221,0.2);border-radius:var(--r-sm);color:var(--txt1);font-size:14px;padding:10px 14px;outline:none;font-style:italic;font-family:inherit;}
-.field input:focus{border-color:var(--cel1);}
-.btn-login{width:100%;background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);font-size:14px;font-weight:700;padding:12px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;letter-spacing:0.05em;margin-top:6px;}
-.btn-login:hover{background:var(--cel1);}
-.error{color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none;}
+.field input{
+  width:100%;
+  background:rgba(14,11,26,0.8);
+  border:0.5px solid var(--border);
+  border-radius:var(--r-sm);
+  color:var(--txt1);
+  font-size:14px;padding:11px 14px;
+  outline:none;font-style:italic;font-family:inherit;
+  transition:border-color 0.15s;
+}
+.field input:focus{border-color:var(--v1);box-shadow:0 0 0 3px rgba(124,58,237,0.1);}
+.btn-login{
+  width:100%;
+  background:var(--v1);
+  border:none;
+  color:#fff;
+  font-size:14px;font-weight:700;
+  padding:13px;border-radius:var(--r-sm);
+  cursor:pointer;font-style:italic;font-family:inherit;
+  letter-spacing:0.05em;margin-top:6px;
+  transition:background 0.15s,box-shadow 0.15s;
+  box-shadow:0 4px 16px rgba(124,58,237,0.3);
+}
+.btn-login:hover{background:var(--v2);box-shadow:0 6px 24px rgba(124,58,237,0.4);}
+.btn-login:disabled{opacity:0.5;cursor:not-allowed;}
+.error{color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.3);border-radius:var(--r-sm);padding:8px;}
 .version{font-size:11px;color:var(--txt3);text-align:center;margin-top:20px;}
 </style>
 </head>
@@ -35,13 +71,13 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   <div class="card">
     <div class="field">
       <label>Usuario</label>
-      <input type="text" id="username" placeholder="Ingresa tu usuario" autocomplete="username">
+      <input type="text" id="username" placeholder="Ingresá tu usuario" autocomplete="username">
     </div>
     <div class="field">
       <label>Contraseña</label>
-      <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+      <input type="password" id="password" placeholder="Ingresá tu contraseña" autocomplete="current-password">
     </div>
-    <button class="btn-login" onclick="login()">Ingresar</button>
+    <button class="btn-login" id="btn-login" onclick="login()">Ingresar</button>
     <div class="error" id="error-msg">Usuario o contraseña incorrectos</div>
   </div>
   <div class="version">v2.0.0 — MANTEN. Sistema Industrial</div>
@@ -57,9 +93,10 @@ async function login() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   if (!username || !password) return;
-  const btn = document.querySelector('.btn-login');
+  const btn = document.getElementById('btn-login');
   btn.textContent = 'Ingresando...';
   btn.disabled = true;
+  document.getElementById('error-msg').style.display = 'none';
   try {
     const form = new FormData();
     form.append('username', username);

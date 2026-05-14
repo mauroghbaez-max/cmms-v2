@@ -6,66 +6,63 @@
 <title>Operador — MANTEN.</title>
 <style>
 :root{
-  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
-  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;
-  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
   --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
-  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
-.topbar{background:var(--az2);border-bottom:0.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.logo{font-size:18px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;}
-.role-pill{background:rgba(37,99,168,0.25);color:var(--cel2);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(91,163,232,0.3);}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+.topbar{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);}
+.logo{font-size:18px;font-weight:700;color:var(--v3);letter-spacing:0.12em;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.role-pill{background:rgba(124,58,237,0.2);color:var(--v3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(124,58,237,0.35);}
 .user-name{color:var(--txt2);font-size:12px;}
-.btn-salir{background:none;border:0.5px solid var(--border);color:#d8e8f5;font-size:12px;padding:6px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;}
+.btn-salir{background:none;border:0.5px solid var(--border);color:var(--txt2);font-size:12px;padding:6px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.btn-salir:hover{border-color:var(--v1);color:var(--txt1);}
 .main{padding:16px 20px;max-width:600px;margin:0 auto;}
-.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--cel3);margin:16px 0 10px;}
-.card{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;}
-.btn{font-size:13px;padding:10px 18px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(37,99,168,0.15);color:var(--cel3);cursor:pointer;font-style:italic;font-family:inherit;width:100%;text-align:center;}
-.btn:hover{border-color:var(--cel1);color:var(--cel2);}
-.btn-primary{background:var(--az4);border-color:var(--cel1);color:var(--txt1);}
+.section-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--v3);margin:16px 0 10px;}
+.card{background:rgba(23,15,46,0.8);border:0.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;backdrop-filter:blur(8px);}
+.btn{font-size:13px;padding:10px 18px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(124,58,237,0.1);color:var(--v3);cursor:pointer;font-style:italic;font-family:inherit;width:100%;text-align:center;transition:all 0.15s;}
+.btn:hover{border-color:var(--v1);background:rgba(124,58,237,0.18);}
+.btn-primary{background:var(--v1);border-color:var(--v2);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.btn-primary:hover{background:var(--v2);}
 .btn-ok{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:var(--ok);font-weight:700;font-size:14px;padding:14px;}
+.btn-ok:hover{background:rgba(16,185,129,0.25);}
 .btn-danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--danger);}
+.btn-danger:hover{background:rgba(239,68,68,0.2);}
 .btn-warn{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--warn);}
+.btn-warn:hover{background:rgba(245,158,11,0.2);}
 .btn-row{display:flex;gap:10px;}
 .btn-row .btn{flex:1;}
 .badge{display:inline-block;font-size:10px;padding:3px 10px;border-radius:20px;}
 .badge-ok{background:rgba(16,185,129,0.15);color:var(--ok);border:0.5px solid rgba(16,185,129,0.3);}
 .badge-warn{background:rgba(245,158,11,0.1);color:var(--warn);border:0.5px solid rgba(245,158,11,0.3);}
-.badge-rol{background:rgba(37,99,168,0.2);color:var(--cel2);border:0.5px solid rgba(91,163,232,0.25);}
+.badge-rol{background:rgba(124,58,237,0.15);color:var(--v3);border:0.5px solid rgba(124,58,237,0.25);}
 .badge-urgente{background:rgba(239,68,68,0.2);color:#ff6b6b;border:0.5px solid rgba(239,68,68,0.4);font-weight:700;}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
 .fg label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;}
-.fg input,.fg select,.fg textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:14px;padding:10px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;}
-.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--cel1);}
-.fg select option{background:var(--az2);}
+.fg input,.fg select,.fg textarea{background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);font-size:14px;padding:10px 12px;outline:none;font-style:italic;font-family:inherit;width:100%;transition:border-color 0.15s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--v1);}
+.fg select option{background:var(--p2);}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;}
 .info-row:last-child{border-bottom:none;}
 .info-label{color:var(--txt3);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;}
 .divider{border:none;border-top:0.5px solid var(--border);margin:12px 0;}
 .empty{color:var(--txt3);font-size:13px;padding:24px;text-align:center;}
 .loading{color:var(--txt3);font-size:13px;padding:16px;text-align:center;}
-
-/* Checklist items */
-.check-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.check-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background 0.1s;}
 .check-item:last-child{border-bottom:none;}
+.check-item:hover{background:rgba(124,58,237,0.04);}
 .check-item.checked .check-box{background:var(--ok);border-color:var(--ok);}
 .check-item.checked .check-label{text-decoration:line-through;color:var(--txt3);}
-.check-box{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:var(--az1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.check-box{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:rgba(14,11,26,0.8);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;transition:all 0.15s;}
 .check-label{flex:1;font-size:13px;}
 .check-meta{font-size:11px;color:var(--txt3);}
-
-/* Pantallas */
 .screen{display:none;}.screen.act{display:block;}
-
-/* QR input grande */
 .qr-input{font-size:18px;padding:14px;text-align:center;letter-spacing:0.1em;}
-
-/* Progreso */
-.progreso{background:rgba(37,99,168,0.1);border-radius:20px;height:6px;margin:8px 0;}
+.progreso{background:rgba(124,58,237,0.1);border-radius:20px;height:6px;margin:8px 0;}
 .progreso-bar{background:var(--ok);border-radius:20px;height:6px;transition:width 0.3s;}
-
 .alert-box{padding:10px 14px;border-radius:var(--r-sm);font-size:12px;margin-bottom:12px;}
 .alert-ok{background:rgba(16,185,129,0.1);border:0.5px solid rgba(16,185,129,0.3);color:var(--ok);}
 .alert-warn{background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.3);color:var(--warn);}
@@ -80,13 +77,13 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span class="user-name" id="user-name"></span>
+    <a href="manual.html" style="background:none;border:0.5px solid var(--border);color:var(--txt2);font-size:11px;padding:5px 10px;border-radius:var(--r-sm);text-decoration:none;font-style:italic;" target="_blank">📖</a>
     <button class="btn-salir" onclick="logout()">Salir</button>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- ═══ PANTALLA INICIO ═══ -->
   <div class="screen act" id="screen-inicio">
     <div class="section-title">¿Qué querés hacer?</div>
     <div style="display:flex;flex-direction:column;gap:10px;">
@@ -99,7 +96,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
   </div>
 
-  <!-- ═══ PANTALLA ESCANEAR ═══ -->
   <div class="screen" id="screen-escanear">
     <div class="section-title">Buscar OT activa</div>
     <div class="card">
@@ -117,7 +113,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
   </div>
 
-  <!-- ═══ PANTALLA CHECKLIST ═══ -->
   <div class="screen" id="screen-checklist">
     <div id="ot-header"></div>
     <div class="section-title">Materiales del servicio</div>
@@ -147,7 +142,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
   </div>
 
-  <!-- ═══ PANTALLA CORRECTIVA ═══ -->
   <div class="screen" id="screen-correctiva">
     <div class="section-title">Reportar falla o rotura</div>
     <div class="card">
@@ -175,7 +169,6 @@ body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helveti
     </div>
   </div>
 
-  <!-- ═══ PANTALLA CIERRE EXITOSO ═══ -->
   <div class="screen" id="screen-exito">
     <div class="card" style="text-align:center;padding:32px 16px;">
       <div style="font-size:48px;margin-bottom:16px;">✅</div>
@@ -226,24 +219,21 @@ function mostrar(screenId) {
   document.getElementById(screenId).classList.add('act');
 }
 
-// ─── BUSCAR OT ─────────────────────────────────────────────────────
-
 async function buscarOT() {
   const codigo = document.getElementById('input-codigo').value.trim();
   if (!codigo) { alert('Ingresá el código del equipo'); return; }
-
   document.getElementById('resultado-busqueda').innerHTML = '<div class="loading">Buscando...</div>';
   try {
     const ot = await api('/operador/ot-por-equipo/'+encodeURIComponent(codigo));
     document.getElementById('resultado-busqueda').innerHTML = `
       <div class="card">
         <div style="margin-bottom:12px;">
-          <span style="font-size:16px;font-weight:700;color:var(--cel2);">${ot.numero}</span>
+          <span style="font-size:16px;font-weight:700;color:var(--v3);">${ot.numero}</span>
           <span class="badge ${ot.tipo==='correctiva'?'badge-warn':'badge-rol'}" style="margin-left:8px;">${ot.tipo}</span>
           ${ot.urgente?'<span class="badge badge-urgente" style="margin-left:4px;">URGENTE</span>':''}
         </div>
         <div class="info-row"><span class="info-label">Equipo</span><span>${ot.equipo_nombre}</span></div>
-        <div class="info-row"><span class="info-label">Plan</span><span>${ot.plan_nombre}</span></div>
+        <div class="info-row"><span class="info-label">Plan</span><span>${ot.plan_nombre||'—'}</span></div>
         <div class="info-row"><span class="info-label">Horómetro actual</span><span>${ot.horometro_actual} hs</span></div>
         <div class="info-row"><span class="info-label">Mecánico</span><span>${ot.mecanico_nombre||'—'}</span></div>
         <div class="info-row"><span class="info-label">Materiales</span><span>${ot.materiales.length} ítems</span></div>
@@ -260,31 +250,23 @@ async function buscarOT() {
   }
 }
 
-// ─── CHECKLIST ─────────────────────────────────────────────────────
-
 async function abrirChecklist(ot) {
   otActual = ot;
   checklist = ot.checklist || {};
-
-  // Iniciar ejecución
   try {
     await api('/operador/ot/'+ot.id+'/iniciar', {method:'POST', body:JSON.stringify({})});
   } catch(e) { /* ya estaba en ejecución, ok */ }
-
-  // Header
   document.getElementById('ot-header').innerHTML = `
     <div class="card" style="margin-bottom:0;border-radius:var(--r) var(--r) 0 0;border-bottom:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div>
-          <span style="font-size:15px;font-weight:700;color:var(--cel2);">${ot.numero}</span>
+          <span style="font-size:15px;font-weight:700;color:var(--v3);">${ot.numero}</span>
           <span style="font-size:12px;color:var(--txt3);margin-left:8px;">${ot.equipo_nombre}</span>
         </div>
         <span class="badge ${ot.tipo==='correctiva'?'badge-warn':'badge-rol'}">${ot.tipo}</span>
       </div>
     </div>
   `;
-
-  // Render checklist
   renderChecklist();
   mostrar('screen-checklist');
 }
@@ -292,13 +274,11 @@ async function abrirChecklist(ot) {
 function renderChecklist() {
   const cont = document.getElementById('checklist-container');
   const mats = otActual.materiales;
-
   if (!mats.length) {
     cont.innerHTML = '<div class="empty">Sin materiales en esta OT</div>';
     document.getElementById('seccion-cierre').style.display = 'block';
     return;
   }
-
   cont.innerHTML = mats.map(m => {
     const tildado = checklist[m.id] === true;
     return `
@@ -311,13 +291,11 @@ function renderChecklist() {
       </div>
     `;
   }).join('');
-
   actualizarProgreso();
 }
 
 function toggleItem(matId) {
   checklist[matId] = !checklist[matId];
-
   const el = document.getElementById('ci-'+matId);
   const box = el.querySelector('.check-box');
   if (checklist[matId]) {
@@ -327,10 +305,7 @@ function toggleItem(matId) {
     el.classList.remove('checked');
     box.textContent = '';
   }
-
   actualizarProgreso();
-
-  // Guardar en servidor
   api('/operador/ot/'+otActual.id+'/checklist', {
     method: 'PUT',
     body: JSON.stringify({checklist})
@@ -341,19 +316,10 @@ function actualizarProgreso() {
   const total = otActual.materiales.length;
   const tildados = Object.values(checklist).filter(v=>v===true).length;
   const pct = total > 0 ? Math.round(tildados/total*100) : 100;
-
   document.getElementById('progreso-txt').textContent = tildados + ' / ' + total;
   document.getElementById('progreso-bar').style.width = pct + '%';
-
-  const seccion = document.getElementById('seccion-cierre');
-  if (tildados >= total) {
-    seccion.style.display = 'block';
-  } else {
-    seccion.style.display = 'none';
-  }
+  document.getElementById('seccion-cierre').style.display = tildados >= total ? 'block' : 'none';
 }
-
-// ─── CERRAR OT ─────────────────────────────────────────────────────
 
 async function cerrarOT() {
   const horometro = parseFloat(document.getElementById('horometro-cierre').value);
@@ -362,7 +328,6 @@ async function cerrarOT() {
     if (!confirm('El horómetro ingresado es menor al de apertura. ¿Confirmás?')) return;
   }
   if (!confirm('¿Confirmar cierre de OT ' + otActual.numero + '?')) return;
-
   try {
     const r = await api('/operador/ot/'+otActual.id+'/cerrar', {
       method: 'POST',
@@ -381,8 +346,6 @@ async function cerrarOT() {
   }
 }
 
-// ─── SOLICITUD CORRECTIVA ──────────────────────────────────────────
-
 async function cargarEquipos() {
   try {
     const equipos = await api('/operador/equipos') || [];
@@ -398,7 +361,6 @@ async function enviarSolicitud() {
   const urgente = document.getElementById('sol-urgente').value === 'true';
   if (!equipoId) { alert('Seleccioná el equipo'); return; }
   if (!desc) { alert('Describí el problema'); return; }
-
   try {
     await api('/operador/solicitud-correctiva', {
       method: 'POST',
@@ -414,7 +376,6 @@ async function enviarSolicitud() {
   }
 }
 
-// Init
 cargarEquipos();
 </script>
 </body>

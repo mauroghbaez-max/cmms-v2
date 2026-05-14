@@ -7,45 +7,45 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root{
-  --az1:#0a1628;--az2:#0d2240;--az3:#1a3a6b;--az4:#2563a8;
-  --cel1:#378add;--cel2:#5ba3e8;--cel3:#b5d4f4;
-  --txt1:#e8f0fc;--txt2:#94b8e0;--txt3:#5a7fa8;
+  --p1:#0e0b1a;--p2:#170f2e;--p3:#2a1b52;--p4:#4c1d95;
+  --v1:#7c3aed;--v2:#6d28d9;--v3:#a78bfa;--v4:#ddd6fe;
+  --txt1:#f0ebff;--txt2:#c4b5fd;--txt3:#7c6faa;
   --ok:#10b981;--warn:#f59e0b;--danger:#ef4444;
-  --r:14px;--r-sm:10px;--border:rgba(55,138,221,0.18);
+  --r:14px;--r-sm:10px;--border:rgba(124,58,237,0.18);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--az1);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
-nav{background:var(--az2);border-bottom:0.5px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;}
-.logo{font-size:22px;font-weight:700;color:var(--cel2);letter-spacing:0.12em;}
-.rol-badge{background:var(--az3);color:var(--cel3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid var(--cel1);}
+body{background:var(--p1);background-image:radial-gradient(ellipse 100% 40% at 50% 0%,rgba(124,58,237,0.08) 0%,transparent 60%);color:var(--txt1);font-family:'Arial Narrow','Helvetica Neue',Arial,sans-serif;font-style:italic;min-height:100vh;}
+nav{background:rgba(14,11,26,0.92);border-bottom:0.5px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:52px;backdrop-filter:blur(16px);}
+.logo{font-size:22px;font-weight:700;color:var(--v3);letter-spacing:0.12em;text-shadow:0 0 20px rgba(124,58,237,0.3);}
+.rol-badge{background:rgba(124,58,237,0.2);color:var(--v3);font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid rgba(124,58,237,0.35);}
 .nav-name{color:var(--txt2);font-size:13px;}
 .spacer{flex:1;}
-.btn-nav{background:transparent;border:0.5px solid var(--border);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;}
-.btn-nav:hover{background:var(--az3);color:var(--txt1);}
+.btn-nav{background:transparent;border:0.5px solid var(--border);color:var(--txt2);padding:5px 14px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s;}
+.btn-nav:hover{background:rgba(124,58,237,0.1);color:var(--txt1);border-color:var(--v1);}
 main{padding:24px;max-width:1000px;margin:0 auto;}
 h2{font-size:13px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
 .toolbar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
-.btn{background:var(--az4);border:0.5px solid var(--cel1);color:var(--txt1);padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;}
-.btn:hover{background:var(--cel1);}
-.btn-warn{background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.4);color:var(--warn);}
+.btn{background:var(--v1);border:0.5px solid var(--v2);color:#fff;padding:9px 18px;border-radius:var(--r-sm);cursor:pointer;font-style:italic;font-family:inherit;font-size:13px;transition:all 0.15s;box-shadow:0 2px 8px rgba(124,58,237,0.3);}
+.btn:hover{background:var(--v2);}
+.btn-warn{background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.4);color:var(--warn);box-shadow:none;}
 .btn-warn:hover{background:rgba(245,158,11,0.2);}
-input,textarea{background:var(--az1);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);padding:9px 12px;font-style:italic;font-family:inherit;font-size:13px;outline:none;}
-input:focus,textarea:focus{border-color:var(--cel1);}
+input,textarea{background:rgba(14,11,26,0.8);border:0.5px solid var(--border);border-radius:var(--r-sm);color:var(--txt1);padding:9px 12px;font-style:italic;font-family:inherit;font-size:13px;outline:none;transition:border-color 0.15s;}
+input:focus,textarea:focus{border-color:var(--v1);box-shadow:0 0 0 2px rgba(124,58,237,0.1);}
 .search{width:280px;}
 .tabla{width:100%;border-collapse:collapse;}
 .tabla th{font-size:10px;color:var(--txt3);padding:8px 12px;text-align:left;text-transform:uppercase;letter-spacing:0.08em;border-bottom:0.5px solid var(--border);}
 .tabla td{padding:10px 12px;font-size:13px;border-bottom:0.5px solid var(--border);}
 .tabla tr:last-child td{border-bottom:none;}
-.tabla tr:hover td{background:rgba(37,99,168,0.06);}
-.hs{font-size:18px;font-weight:700;color:var(--cel2);}
-.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:var(--az3);color:var(--txt1);cursor:pointer;font-style:italic;font-family:inherit;}
-.btn-sm:hover{background:var(--az4);}
+.tabla tr:hover td{background:rgba(124,58,237,0.05);}
+.hs{font-size:18px;font-weight:700;color:var(--v3);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:var(--r-sm);border:0.5px solid var(--border);background:rgba(124,58,237,0.1);color:var(--v3);cursor:pointer;font-style:italic;font-family:inherit;transition:all 0.15s;}
+.btn-sm:hover{background:rgba(124,58,237,0.2);border-color:var(--v1);}
 .btn-sm-warn{border-color:rgba(245,158,11,0.4);color:var(--warn);background:rgba(245,158,11,0.08);}
 .btn-sm-warn:hover{background:rgba(245,158,11,0.15);}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .overlay.show{display:flex;}
-.modal{background:var(--az2);border:0.5px solid var(--border);border-radius:var(--r);padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
-.modal h3{color:var(--cel2);margin-bottom:6px;font-size:16px;}
+.modal{background:var(--p2);border:0.5px solid var(--border);border-radius:var(--r);padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 64px rgba(0,0,0,0.5);}
+.modal h3{color:var(--v3);margin-bottom:6px;font-size:16px;}
 .modal-sub{font-size:12px;color:var(--txt3);margin-bottom:18px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;}
@@ -61,6 +61,7 @@ input:focus,textarea:focus{border-color:var(--cel1);}
   <span class="rol-badge">Horometrista</span>
   <span class="nav-name" id="nav-name"></span>
   <span class="spacer"></span>
+  <a href="manual.html" class="btn-nav" target="_blank">📖 Manual</a>
   <button class="btn-nav" onclick="salir()">Salir</button>
 </nav>
 
@@ -81,7 +82,6 @@ input:focus,textarea:focus{border-color:var(--cel1);}
   </table>
 </main>
 
-<!-- Modal nueva lectura -->
 <div class="overlay" id="overlay-lectura">
   <div class="modal">
     <h3>Cargar horómetro</h3>
@@ -101,7 +101,6 @@ input:focus,textarea:focus{border-color:var(--cel1);}
   </div>
 </div>
 
-<!-- Modal corrección horómetro -->
 <div class="overlay" id="overlay-correccion">
   <div class="modal">
     <h3>Corregir horómetro</h3>
@@ -114,8 +113,8 @@ input:focus,textarea:focus{border-color:var(--cel1);}
       <input id="f-correccion" type="number" step="0.1" placeholder="Ingresá el valor correcto">
     </div>
     <div class="field">
-      <label>Motivo de la corrección</label>
-      <textarea id="f-correccion-obs" rows="2" placeholder="Opcional — explicá el error..."></textarea>
+      <label>Motivo de la corrección *</label>
+      <textarea id="f-correccion-motivo" rows="2" placeholder="Explicá el motivo de la corrección..."></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn-sm" onclick="cerrarModal('overlay-correccion')">Cancelar</button>
@@ -124,7 +123,6 @@ input:focus,textarea:focus{border-color:var(--cel1);}
   </div>
 </div>
 
-<!-- Modal scanner QR -->
 <div class="overlay" id="overlay-scanner">
   <div class="modal">
     <h3>Escanear QR</h3>
@@ -168,7 +166,7 @@ function renderizar(lista) {
   tb.innerHTML = lista.map(e => `
     <tr>
       <td style="font-weight:700;">${e.nombre}</td>
-      <td style="color:var(--cel2);font-size:11px;">${e.codigo_interno}</td>
+      <td style="color:var(--v3);font-size:11px;">${e.codigo_interno}</td>
       <td style="color:var(--txt3);">${e.ubicacion || '—'}</td>
       <td><span class="hs">${(e.horometro_actual || 0).toLocaleString()} hs</span></td>
       <td style="display:flex;gap:6px;">
@@ -186,8 +184,6 @@ function filtrar(q) {
   );
   renderizar(filtrados);
 }
-
-// ─── NUEVA LECTURA ─────────────────────────────────────────────────
 
 function abrirLectura(id, nombre, actual) {
   equipoSelId = id;
@@ -208,23 +204,23 @@ async function guardarLectura() {
   if (r) { cerrarModal('overlay-lectura'); cargar(); }
 }
 
-// ─── CORRECCIÓN ────────────────────────────────────────────────────
-
 function abrirCorreccion(id, nombre, actual) {
   equipoSelId = id;
   document.getElementById('correccion-equipo-nombre').textContent = nombre + ' — Actual: ' + actual.toLocaleString() + ' hs';
   document.getElementById('f-correccion').value = '';
-  document.getElementById('f-correccion-obs').value = '';
+  document.getElementById('f-correccion-motivo').value = '';
   document.getElementById('overlay-correccion').classList.add('show');
 }
 
 async function guardarCorreccion() {
   const lectura = parseFloat(document.getElementById('f-correccion').value);
   if (!lectura) { alert('Ingresá el valor correcto'); return; }
+  // FIX: use user-entered motivo instead of hardcoded string
+  const motivo = document.getElementById('f-correccion-motivo').value.trim() || 'Corrección del horometrista';
   const r = await api('PUT', `/horometrista/horometros/${equipoSelId}/corregir`, {
     lectura,
-    motivo: 'Corrección del horometrista',
-    observaciones: document.getElementById('f-correccion-obs').value || null
+    motivo,
+    observaciones: null
   });
   if (r) {
     alert('Horómetro corregido.');
@@ -232,8 +228,6 @@ async function guardarCorreccion() {
     cargar();
   }
 }
-
-// ─── SCANNER QR ────────────────────────────────────────────────────
 
 function abrirScanner() {
   document.getElementById('overlay-scanner').classList.add('show');
@@ -259,11 +253,7 @@ function cerrarScanner() {
   document.getElementById('overlay-scanner').classList.remove('show');
 }
 
-// ─── UTILS ─────────────────────────────────────────────────────────
-
-function cerrarModal(id) {
-  document.getElementById(id).classList.remove('show');
-}
+function cerrarModal(id) { document.getElementById(id).classList.remove('show'); }
 
 window.onclick = e => {
   ['overlay-lectura','overlay-correccion','overlay-scanner'].forEach(id => {
