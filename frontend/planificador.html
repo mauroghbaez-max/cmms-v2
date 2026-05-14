@@ -458,8 +458,11 @@ function renderReporte(data) {
       '<td style="text-align:right;font-weight:700;">'+r.horas_hito+' hs</td>' +
       '<td style="text-align:right;">'+faltantes+'</td>' +
       '<td style="text-align:right;color:var(--txt3);">'+r.horas_alerta+' hs</td>' +
-      '<td><button class="btn btn-sm" onclick=\'verHistorial("'+r.equipo_id+'","'+r.equipo_nombre+'")\'>Historial</button> '+
-      '<button class="btn btn-sm btn-warn" onclick=\'abrirCorreccion("'+r.equipo_id+'",'+r.horometro_actual+')\'>Corregir hs</button></td>' +
+      '<td>' +
+        (r.ot_activa_numero ? '<span class="badge badge-warn" style="margin-right:6px;" title="Ya hay una OT en curso para este plan">OT '+r.ot_activa_numero+'</span>' : '') +
+        '<button class="btn btn-sm" onclick=\'verHistorial("'+r.equipo_id+'","'+r.equipo_nombre+'")\'>Historial</button> '+
+        '<button class="btn btn-sm btn-warn" onclick=\'abrirCorreccion("'+r.equipo_id+'",'+r.horometro_actual+')\'>Corregir hs</button>' +
+      '</td>' +
       '</tr>';
   }).join('');
 }

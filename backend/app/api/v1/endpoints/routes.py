@@ -375,14 +375,20 @@ async def cargar_horometro(payload: dict, db: AsyncSession = Depends(get_db), cu
     equipo = result.fetchone()
     if not equipo:
         raise HTTPException(404, "Equipo no encontrado")
+    actual = equipo.horometro_actual or 0
+    nueva = payload.get("lectura")
+    if nueva is None:
+        raise HTTPException(400, "La lectura es obligatoria")
+    if float(nueva) <= float(actual):
+        raise HTTPException(400, f"La lectura ingresada ({nueva} hs) debe ser mayor al horómetro actual ({actual} hs). Si necesitás corregir un error, usá la función Corregir.")
     await db.execute(text("""
         INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, observaciones)
         VALUES (:id, :eid, :uid, :lec, :ant, :obs)
     """), {"id": str(uuid.uuid4()), "eid": payload["equipo_id"], "uid": current_user["id"],
-           "lec": payload["lectura"], "ant": equipo.horometro_actual,
+           "lec": nueva, "ant": actual,
            "obs": payload.get("observaciones")})
     await db.execute(text("UPDATE equipos SET horometro_actual = :lec WHERE id = :id"),
-                     {"lec": payload["lectura"], "id": payload["equipo_id"]})
+                     {"lec": nueva, "id": payload["equipo_id"]})
     if payload.get("obs_horometrista") is not None:
         await db.execute(text("UPDATE equipos SET obs_horometrista = :obs WHERE id = :id"),
                          {"obs": payload.get("obs_horometrista"), "id": payload["equipo_id"]})
@@ -403,10 +409,16 @@ async def historial_horometro(equipo_id: str, db: AsyncSession = Depends(get_db)
 
 @router.put("/horometrista/horometros/{equipo_id}/corregir")
 async def corregir_horometro(equipo_id: str, payload: dict, db: AsyncSession = Depends(get_db), current_user: dict = Depends(require_rol("horometrista"))):
-    result = await db.execute(text("SELECT id, lectura FROM horometros WHERE equipo_id = :eid ORDER BY fecha DESC LIMIT 1"), {"eid": equipo_id})
+    result = await db.execute(text("""
+        SELECT id, lectura FROM horometros
+        WHERE equipo_id = :eid
+          AND fecha >= CURRENT_DATE
+          AND fecha < CURRENT_DATE + interval '1 day'
+        ORDER BY fecha DESC LIMIT 1
+    """), {"eid": equipo_id})
     ultima = result.fetchone()
     if not ultima:
-        raise HTTPException(404, "No hay lecturas para corregir")
+        raise HTTPException(404, "No hay lectura de hoy para corregir. Solo podés corregir la carga del día de hoy.")
     await db.execute(text("""
         INSERT INTO horometros (id, equipo_id, usuario_id, lectura, lectura_anterior, es_correccion, lectura_original, motivo_correccion, observaciones)
         VALUES (:id, :eid, :uid, :lec, :ant, true, :orig, :motivo, :obs)

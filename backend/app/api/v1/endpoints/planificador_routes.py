@@ -48,7 +48,17 @@ async def reporte_horometros(
                   AND o.estado    = 'completada'
                 ORDER BY o.fecha_cierre DESC
                 LIMIT 1
-            ) AS fecha_ultimo_servicio
+            ) AS fecha_ultimo_servicio,
+            -- OT activa para este plan (para evitar duplicados)
+            (
+                SELECT o.numero
+                FROM ordenes_trabajo o
+                WHERE o.equipo_id = e.id
+                  AND o.plan_id   = p.id
+                  AND o.estado NOT IN ('completada', 'cancelada')
+                ORDER BY o.fecha_apertura DESC
+                LIMIT 1
+            ) AS ot_activa_numero
         FROM equipos e
         JOIN planes_mantenimiento p ON p.equipo_id = e.id
         WHERE e.activo = true
@@ -87,6 +97,7 @@ async def reporte_horometros(
             "hs_acumuladas":           round(hs_acumuladas, 1),
             "hs_faltantes":            round(hs_faltantes, 1),
             "semaforo":                semaforo,
+            "ot_activa_numero":        r.ot_activa_numero,
         })
     return data
 
